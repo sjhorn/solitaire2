@@ -8,24 +8,24 @@ void main() {
       expect(CardSuit.values.map((e) => e.index), equals([0, 1, 2, 3]));
     });
 
-    test('Spades returns correct symbol and color', () {
-      expect(CardSuit.Spades.symbol, '♠');
-      expect(CardSuit.Spades.color, 'black');
+    test('spades returns correct symbol and color', () {
+      expect(CardSuit.spades.symbol, '♠');
+      expect(CardSuit.spades.color, 'black');
     });
 
-    test('Hearts returns correct symbol and color', () {
-      expect(CardSuit.Hearts.symbol, '♥');
-      expect(CardSuit.Hearts.color, 'red');
+    test('hearts returns correct symbol and color', () {
+      expect(CardSuit.hearts.symbol, '♥');
+      expect(CardSuit.hearts.color, 'red');
     });
 
-    test('Diamonds returns correct symbol and color', () {
-      expect(CardSuit.Diamonds.symbol, '♦');
-      expect(CardSuit.Diamonds.color, 'red');
+    test('diamonds returns correct symbol and color', () {
+      expect(CardSuit.diamonds.symbol, '♦');
+      expect(CardSuit.diamonds.color, 'red');
     });
 
-    test('Clubs returns correct symbol and color', () {
-      expect(CardSuit.Clubs.symbol, '♣');
-      expect(CardSuit.Clubs.color, 'black');
+    test('clubs returns correct symbol and color', () {
+      expect(CardSuit.clubs.symbol, '♣');
+      expect(CardSuit.clubs.color, 'black');
     });
   });
 }

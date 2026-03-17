@@ -1,9 +1,9 @@
 /// Card suit enumeration for playing cards.
 enum CardSuit {
-  Spades(symbol: '♠', color: 'black'),
-  Hearts(symbol: '♥', color: 'red'),
-  Diamonds(symbol: '♦', color: 'red'),
-  Clubs(symbol: '♣', color: 'black');
+  spades(symbol: '♠', color: 'black'),
+  hearts(symbol: '♥', color: 'red'),
+  diamonds(symbol: '♦', color: 'red'),
+  clubs(symbol: '♣', color: 'black');
 
   const CardSuit({required this.symbol, required this.color});
 
