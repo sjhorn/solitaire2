@@ -1,0 +1,29 @@
+name: Feature
+description: New feature or enhancement
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      value: |
+        - [ ] ...
+    validations:
+      required: true
+  - type: textarea
+    id: tasks
+    attributes:
+      label: Tasks
+      value: |
+        - [ ] Branch created
+        - [ ] Failing test (RED)
+        - [ ] Tests confirmed failing
+        - [ ] Implementation (GREEN)
+        - [ ] All tests passing (90%+ coverage)
+        - [ ] Analysis clean
+        - [ ] PR created

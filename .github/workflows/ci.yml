@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - run: dart analyze --fatal-infos
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - run: flutter test --coverage
+      - name: Check coverage >= 90%
+        run: |
+          total=$(grep -oP 'LF:\K\d+' coverage/lcov.info | paste -sd+ | bc)
+          hit=$(grep -oP 'LH:\K\d+' coverage/lcov.info | paste -sd+ | bc)
+          pct=$((hit * 100 / total))
+          echo "Coverage: ${pct}%"
+          if [ "$pct" -lt 90 ]; then
+            echo "::error::Coverage ${pct}% is below 90% threshold"
+            exit 1
+          fi
+
+  pana:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - run: dart pub global activate pana
+      - run: dart pub global run pana --no-warning
