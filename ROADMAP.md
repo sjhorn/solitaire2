@@ -8,8 +8,6 @@ A phased plan for building a fully-featured Klondike Solitaire game in Flutter w
 
 **Goal:** Establish a clean, scalable foundation before writing any game logic.
 
-- [ ] Create a new Flutter project (`flutter create solitaire`)
-- [ ] Choose and configure state management (recommended: **Riverpod** or **Bloc**)
 - [ ] Define the folder structure:
   ```
   lib/
@@ -20,7 +18,6 @@ A phased plan for building a fully-featured Klondike Solitaire game in Flutter w
   └── main.dart
   ```
 - [ ] Add dependencies to `pubspec.yaml`:
-  - `flutter_riverpod` (or `flutter_bloc`)
   - `collection` (for list utilities)
   - `audioplayers` (for sound effects, later)
 - [ ] Set up `CardSuit` and `CardRank` enums

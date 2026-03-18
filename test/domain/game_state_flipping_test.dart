@@ -11,12 +11,21 @@ void main() {
   group('GameState - Flipping', () {
     group('flipTableauCard', () {
       test('reveals face-down card when top face-up card removed', () {
-        final king =
-            PlayingCard(suit: CardSuit.hearts, rank: CardRank.king, faceUp: true);
+        final king = PlayingCard(
+          suit: CardSuit.hearts,
+          rank: CardRank.king,
+          faceUp: true,
+        );
         final queen = PlayingCard(
-            suit: CardSuit.spades, rank: CardRank.queen, faceUp: false);
+          suit: CardSuit.spades,
+          rank: CardRank.queen,
+          faceUp: false,
+        );
         final jack = PlayingCard(
-            suit: CardSuit.diamonds, rank: CardRank.jack, faceUp: true);
+          suit: CardSuit.diamonds,
+          rank: CardRank.jack,
+          faceUp: true,
+        );
 
         final tableauPiles = List.generate(
           7,
@@ -72,8 +81,11 @@ void main() {
       });
 
       test('returns null when top card is already face-down', () {
-        final card =
-            PlayingCard(suit: CardSuit.hearts, rank: CardRank.ace, faceUp: false);
+        final card = PlayingCard(
+          suit: CardSuit.hearts,
+          rank: CardRank.ace,
+          faceUp: false,
+        );
 
         final tableauPiles = List.generate(
           7,
@@ -97,8 +109,11 @@ void main() {
       });
 
       test('returns null when only one card in pile', () {
-        final card =
-            PlayingCard(suit: CardSuit.hearts, rank: CardRank.ace, faceUp: true);
+        final card = PlayingCard(
+          suit: CardSuit.hearts,
+          rank: CardRank.ace,
+          faceUp: true,
+        );
 
         final tableauPiles = List.generate(
           7,
@@ -122,12 +137,22 @@ void main() {
       });
 
       test('preserves isSelected flag when flipping card', () {
-        final king =
-            PlayingCard(suit: CardSuit.hearts, rank: CardRank.king, faceUp: true);
+        final king = PlayingCard(
+          suit: CardSuit.hearts,
+          rank: CardRank.king,
+          faceUp: true,
+        );
         final queen = PlayingCard(
-            suit: CardSuit.spades, rank: CardRank.queen, faceUp: false, isSelected: true);
+          suit: CardSuit.spades,
+          rank: CardRank.queen,
+          faceUp: false,
+          isSelected: true,
+        );
         final jack = PlayingCard(
-            suit: CardSuit.diamonds, rank: CardRank.jack, faceUp: true);
+          suit: CardSuit.diamonds,
+          rank: CardRank.jack,
+          faceUp: true,
+        );
 
         final tableauPiles = List.generate(
           7,
@@ -158,16 +183,25 @@ void main() {
 
     group('flipWasteCard', () {
       test('flips face-up waste card to face-down', () {
-        final card =
-            PlayingCard(suit: CardSuit.hearts, rank: CardRank.ace, faceUp: true);
+        final card = PlayingCard(
+          suit: CardSuit.hearts,
+          rank: CardRank.ace,
+          faceUp: true,
+        );
 
         final wastePile = GamePile(type: PileType.waste);
         wastePile.addCard(card);
 
         final state = GameState.createWithPiles(
           deck: Deck(),
-          tableauPiles: List.generate(7, (index) => GamePile(type: PileType.tableau)),
-          foundationPiles: List.generate(4, (index) => GamePile(type: PileType.foundations)),
+          tableauPiles: List.generate(
+            7,
+            (index) => GamePile(type: PileType.tableau),
+          ),
+          foundationPiles: List.generate(
+            4,
+            (index) => GamePile(type: PileType.foundations),
+          ),
           stockPile: GamePile(type: PileType.stock),
           wastePile: wastePile,
         );
@@ -184,15 +218,24 @@ void main() {
 
       test('flips face-down waste card to face-up', () {
         final card = PlayingCard(
-            suit: CardSuit.hearts, rank: CardRank.ace, faceUp: false);
+          suit: CardSuit.hearts,
+          rank: CardRank.ace,
+          faceUp: false,
+        );
 
         final wastePile = GamePile(type: PileType.waste);
         wastePile.addCard(card);
 
         final state = GameState.createWithPiles(
           deck: Deck(),
-          tableauPiles: List.generate(7, (index) => GamePile(type: PileType.tableau)),
-          foundationPiles: List.generate(4, (index) => GamePile(type: PileType.foundations)),
+          tableauPiles: List.generate(
+            7,
+            (index) => GamePile(type: PileType.tableau),
+          ),
+          foundationPiles: List.generate(
+            4,
+            (index) => GamePile(type: PileType.foundations),
+          ),
           stockPile: GamePile(type: PileType.stock),
           wastePile: wastePile,
         );
@@ -206,8 +249,14 @@ void main() {
       test('returns null when waste pile is empty', () {
         final state = GameState.createWithPiles(
           deck: Deck(),
-          tableauPiles: List.generate(7, (index) => GamePile(type: PileType.tableau)),
-          foundationPiles: List.generate(4, (index) => GamePile(type: PileType.foundations)),
+          tableauPiles: List.generate(
+            7,
+            (index) => GamePile(type: PileType.tableau),
+          ),
+          foundationPiles: List.generate(
+            4,
+            (index) => GamePile(type: PileType.foundations),
+          ),
           stockPile: GamePile(type: PileType.stock),
           wastePile: GamePile(type: PileType.waste),
         );

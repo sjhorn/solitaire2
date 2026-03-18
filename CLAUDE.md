@@ -3,6 +3,8 @@
 Strict TDD with GitHub issue tracking. Use MCP tools exclusively. Bash is last resort.
 Work through steps in order. Never skip steps.
 
+Our github repo is: https://github.com/sjhorn/solitaire2
+
 ---
 
 ## MCP Servers

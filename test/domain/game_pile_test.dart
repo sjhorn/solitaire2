@@ -134,8 +134,10 @@ void main() {
         final card = PlayingCard(suit: CardSuit.hearts, rank: CardRank.ace);
         pile.addCard(card);
 
-        expect(() => pile.removeTopCardIf((c) => c.suit == CardSuit.spades),
-            throwsStateError);
+        expect(
+          () => pile.removeTopCardIf((c) => c.suit == CardSuit.spades),
+          throwsStateError,
+        );
       });
 
       test('throws StateError when pile is empty', () {
@@ -157,7 +159,10 @@ void main() {
 
       test('flips face-down card to face-up', () {
         final card = PlayingCard(
-            suit: CardSuit.spades, rank: CardRank.king, faceUp: false);
+          suit: CardSuit.spades,
+          rank: CardRank.king,
+          faceUp: false,
+        );
         pile.addCard(card);
 
         pile.flipTopCard();
@@ -178,8 +183,12 @@ void main() {
         final card = PlayingCard(suit: CardSuit.diamonds, rank: CardRank.two);
         pile.addCard(card);
 
-        expect(() => pile.cards.add(PlayingCard(suit: CardSuit.clubs, rank: CardRank.three)),
-            throwsA(isA<UnsupportedError>()));
+        expect(
+          () => pile.cards.add(
+            PlayingCard(suit: CardSuit.clubs, rank: CardRank.three),
+          ),
+          throwsA(isA<UnsupportedError>()),
+        );
       });
     });
 
@@ -198,8 +207,12 @@ void main() {
         final card = PlayingCard(suit: CardSuit.diamonds, rank: CardRank.two);
         pile.addCard(card);
 
-        expect(() => pile.topCards.add(PlayingCard(suit: CardSuit.clubs, rank: CardRank.three)),
-            throwsA(isA<UnsupportedError>()));
+        expect(
+          () => pile.topCards.add(
+            PlayingCard(suit: CardSuit.clubs, rank: CardRank.three),
+          ),
+          throwsA(isA<UnsupportedError>()),
+        );
       });
     });
   });
