@@ -16,6 +16,9 @@ class TableauPileWidget extends StatelessWidget {
   /// Callback when a card is dropped on this tableau.
   final Function(PlayingCard card, int tableauIndex)? onDrop;
 
+  /// Callback when a card is tapped for auto-move.
+  final Function(PlayingCard card)? onAutoMove;
+
   /// The index of this tableau pile (0-6).
   final int tableauIndex;
 
@@ -24,6 +27,7 @@ class TableauPileWidget extends StatelessWidget {
     required this.pile,
     required this.xOffset,
     this.onDrop,
+    this.onAutoMove,
     this.tableauIndex = 0,
   });
 
@@ -82,15 +86,21 @@ class TableauPileWidget extends StatelessWidget {
       // Get all consecutive face-up cards from the top
       final stack = _getFaceUpStack();
 
-      return Draggable<List<PlayingCard>>(
-        data: stack,
-        childWhenDragging: _buildStackPreview(stack, false),
-        feedback: _buildStackPreview(stack, true),
-        child: Container(
-          decoration: BoxDecoration(
-            border: isDragOver ? Border.all(color: Colors.green, width: 2) : null,
-          ),
-          child: CardWidget(card: card),
+      final cardWidget = Container(
+        decoration: BoxDecoration(
+          border: isDragOver ? Border.all(color: Colors.green, width: 2) : null,
+        ),
+        child: CardWidget(card: card),
+      );
+
+      // Wrap with GestureDetector for tap-to-move
+      return GestureDetector(
+        onTap: onAutoMove != null ? () => onAutoMove!(card) : null,
+        child: Draggable<List<PlayingCard>>(
+          data: stack,
+          childWhenDragging: _buildStackPreview(stack, false),
+          feedback: _buildStackPreview(stack, true),
+          child: cardWidget,
         ),
       );
     }

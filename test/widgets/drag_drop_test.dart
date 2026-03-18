@@ -8,6 +8,7 @@ import 'package:solitaire/src/domain/game_state.dart';
 import 'package:solitaire/src/domain/pile_type.dart';
 import 'package:solitaire/src/domain/playing_card.dart';
 import 'package:solitaire/src/widgets/board_widget.dart';
+import 'package:solitaire/src/widgets/card_widget.dart';
 import 'package:solitaire/src/widgets/foundation_pile_widget.dart';
 import 'package:solitaire/src/widgets/tableau_pile_widget.dart';
 import 'package:solitaire/src/widgets/waste_pile_widget.dart';
@@ -391,6 +392,68 @@ void main() {
       await tester.pump();
 
       expect(find.byType(FoundationPileWidget), findsOneWidget);
+    });
+  });
+
+  group('Tap-to-Move Shortcut', () {
+    testWidgets('waste pile tap triggers callback', (tester) async {
+      final wastePile = GamePile(type: PileType.waste);
+      wastePile.addCard(PlayingCard(suit: CardSuit.hearts, rank: CardRank.ace, faceUp: true));
+
+      bool onTapCalled = false;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: WastePileWidget(
+              pile: wastePile,
+              onTap: () => onTapCalled = true,
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      // Tap the waste pile
+      await tester.tap(find.byType(GestureDetector));
+      await tester.pump();
+
+      // Tap callback should be invoked
+      expect(onTapCalled, true);
+    });
+
+    testWidgets('tableau card tap triggers auto-move callback', (tester) async {
+      final tableauPile = GamePile(type: PileType.tableau);
+      tableauPile.addCard(PlayingCard(suit: CardSuit.hearts, rank: CardRank.two, faceUp: true));
+
+      PlayingCard? receivedCard;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SizedBox(
+              width: 100,
+              height: 150,
+              child: TableauPileWidget(
+                pile: tableauPile,
+                xOffset: 0,
+                tableauIndex: 0,
+                onDrop: (card, index) {},
+                onAutoMove: (card) => receivedCard = card,
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      // Tap the top card
+      await tester.tap(find.byType(CardWidget).first);
+      await tester.pump();
+
+      // Auto-move callback should be invoked with the card
+      expect(receivedCard, isNotNull);
+      expect(receivedCard!.rank, CardRank.two);
     });
   });
 }

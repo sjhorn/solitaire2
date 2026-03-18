@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:solitaire/src/domain/game_pile.dart';
+import 'package:solitaire/src/domain/playing_card.dart';
 import 'package:solitaire/src/widgets/card_widget.dart';
 
 /// A widget that displays the waste pile.
@@ -9,21 +10,27 @@ class WastePileWidget extends StatelessWidget {
   /// The waste pile containing cards.
   final GamePile pile;
 
-  const WastePileWidget({super.key, required this.pile});
+  /// Callback when the waste pile is tapped.
+  final VoidCallback? onTap;
+
+  const WastePileWidget({super.key, required this.pile, this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 80,
-      height: 120,
-      margin: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey, width: 2),
-        borderRadius: BorderRadius.circular(8),
+    return GestureDetector(
+      onTap: pile.isEmpty ? null : onTap,
+      child: Container(
+        width: 80,
+        height: 120,
+        margin: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey, width: 2),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: pile.isEmpty
+            ? const SizedBox.shrink()
+            : CardWidget(card: pile.topCardThrow),
       ),
-      child: pile.isEmpty
-          ? const SizedBox.shrink()
-          : CardWidget(card: pile.topCardThrow),
     );
   }
 }
