@@ -8,10 +8,7 @@ void main() {
     });
 
     test('has correct value indices', () {
-      expect(
-        PileType.values.map((e) => e.index),
-        equals([0, 1, 2, 3]),
-      );
+      expect(PileType.values.map((e) => e.index), equals([0, 1, 2, 3]));
     });
 
     test('foundations is index 0', () {

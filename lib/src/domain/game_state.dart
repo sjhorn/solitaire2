@@ -269,12 +269,14 @@ class GameState {
       newCards.add(_wastePile.cards[i]);
     }
     // Add flipped card
-    newCards.add(PlayingCard(
-      suit: card.suit,
-      rank: card.rank,
-      faceUp: !card.faceUp,
-      isSelected: card.isSelected,
-    ));
+    newCards.add(
+      PlayingCard(
+        suit: card.suit,
+        rank: card.rank,
+        faceUp: !card.faceUp,
+        isSelected: card.isSelected,
+      ),
+    );
 
     final newWaste = GamePile(type: PileType.waste);
     newWaste.addCards(newCards);
