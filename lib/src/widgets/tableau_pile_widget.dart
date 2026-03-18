@@ -79,10 +79,13 @@ class TableauPileWidget extends StatelessWidget {
     final isFaceUp = card.faceUp;
 
     if (isTopCard && isFaceUp) {
-      return Draggable<PlayingCard>(
-        data: card,
-        childWhenDragging: CardWidget(card: card),
-        feedback: CardWidget(card: card),
+      // Get all consecutive face-up cards from the top
+      final stack = _getFaceUpStack();
+
+      return Draggable<List<PlayingCard>>(
+        data: stack,
+        childWhenDragging: _buildStackPreview(stack, false),
+        feedback: _buildStackPreview(stack, true),
         child: Container(
           decoration: BoxDecoration(
             border: isDragOver ? Border.all(color: Colors.green, width: 2) : null,
@@ -93,6 +96,53 @@ class TableauPileWidget extends StatelessWidget {
     }
 
     return CardWidget(card: card);
+  }
+
+  /// Returns all consecutive face-up cards from the top of the pile
+  List<PlayingCard> _getFaceUpStack() {
+    final stack = <PlayingCard>[];
+    // Start from the top and go down while cards are face-up
+    for (var i = pile.cards.length - 1; i >= 0; i--) {
+      if (pile.cards[i].faceUp) {
+        stack.insert(0, pile.cards[i]);
+      } else {
+        break;
+      }
+    }
+    return stack;
+  }
+
+  /// Builds a visual preview of the card stack for drag feedback
+  Widget _buildStackPreview(List<PlayingCard> stack, bool isFeedback) {
+    if (stack.length == 1) {
+      return CardWidget(card: stack.first);
+    }
+
+    // Show fanned stack of cards
+    final cardWidth = 80.0;
+    final cardHeight = 120.0;
+    final overlap = 20.0;
+    final totalWidth = cardWidth + (stack.length - 1) * overlap;
+    final totalHeight = cardHeight;
+
+    return SizedBox(
+      width: totalWidth,
+      height: totalHeight,
+      child: Stack(
+        children: stack
+            .asMap()
+            .entries
+            .map((entry) => Positioned(
+                  left: entry.key * overlap,
+                  top: 0,
+                  child: CardWidget(
+                    card: entry.value,
+                    size: isFeedback ? const Size(85, 130) : const Size(80, 120),
+                  ),
+                ))
+            .toList(),
+      ),
+    );
   }
 
   bool _isValidDrop(PlayingCard card) {

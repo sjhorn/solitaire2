@@ -31,8 +31,8 @@ void main() {
       );
       await tester.pump();
 
-      // Top face-up card should be draggable
-      expect(find.byType(Draggable<PlayingCard>), findsOneWidget);
+      // Top face-up card should be draggable (as a single-card stack)
+      expect(find.byType(Draggable<List<PlayingCard>>), findsOneWidget);
     });
 
     testWidgets('face-down card is not draggable', (tester) async {
@@ -53,7 +53,7 @@ void main() {
       await tester.pump();
 
       // Face-down card should not be draggable
-      expect(find.byType(Draggable<PlayingCard>), findsNothing);
+      expect(find.byType(Draggable<List<PlayingCard>>), findsNothing);
     });
 
     testWidgets('only top card is draggable in a stack', (tester) async {
@@ -75,8 +75,8 @@ void main() {
       );
       await tester.pump();
 
-      // Only one draggable (the top card)
-      expect(find.byType(Draggable<PlayingCard>), findsOneWidget);
+      // Only one draggable (the top card, carrying the full stack)
+      expect(find.byType(Draggable<List<PlayingCard>>), findsOneWidget);
     });
   });
 
@@ -176,7 +176,7 @@ void main() {
 
       // Verify all piles are rendered
       expect(find.byType(TableauPileWidget), findsNWidgets(7));
-      expect(find.byType(Draggable<PlayingCard>), findsOneWidget); // Top card of first tableau pile
+      expect(find.byType(Draggable<List<PlayingCard>>), findsOneWidget); // Top card of first tableau pile
     });
   });
 
@@ -275,6 +275,57 @@ void main() {
     });
   });
 
+  group('Drag & Drop - Multi-card stack', () {
+    testWidgets('drags stack of face-up cards as List<PlayingCard>', (tester) async {
+      final pile = GamePile(type: PileType.tableau);
+      // Add a stack where all cards are face-up
+      pile.addCard(PlayingCard(suit: CardSuit.spades, rank: CardRank.king, faceUp: true));
+      pile.addCard(PlayingCard(suit: CardSuit.hearts, rank: CardRank.queen, faceUp: true));
+      pile.addCard(PlayingCard(suit: CardSuit.clubs, rank: CardRank.jack, faceUp: true));
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SizedBox(
+              width: 300,
+              height: 200,
+              child: TableauPileWidget(pile: pile, xOffset: 0),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      // Multi-card drag should carry List<PlayingCard> as the drag data
+      expect(find.byType(Draggable<List<PlayingCard>>), findsOneWidget);
+    });
+
+    testWidgets('draggable stack contains all face-up cards', (tester) async {
+      final pile = GamePile(type: PileType.tableau);
+      pile.addCard(PlayingCard(suit: CardSuit.spades, rank: CardRank.king, faceUp: true));
+      pile.addCard(PlayingCard(suit: CardSuit.hearts, rank: CardRank.queen, faceUp: true));
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SizedBox(
+              width: 300,
+              height: 200,
+              child: TableauPileWidget(pile: pile, xOffset: 0),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      final draggable = tester.widget<Draggable<List<PlayingCard>>>(
+        find.byType(Draggable<List<PlayingCard>>),
+      );
+      // The drag data should contain both cards
+      expect(draggable.data, hasLength(2));
+    });
+  });
+
   group('Drag & Drop - End to End', () {
     testWidgets('can drag card from tableau to foundation', (tester) async {
       final aceHearts = GamePile(type: PileType.foundations);
@@ -313,7 +364,7 @@ void main() {
       // Verify both widgets are rendered
       expect(find.byType(TableauPileWidget), findsOneWidget);
       expect(find.byType(FoundationPileWidget), findsOneWidget);
-      expect(find.byType(Draggable<PlayingCard>), findsOneWidget);
+      expect(find.byType(Draggable<List<PlayingCard>>), findsOneWidget);
     });
 
     testWidgets('can drag card from waste to foundation', (tester) async {
