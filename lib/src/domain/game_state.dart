@@ -427,7 +427,6 @@ class GameState {
     }
 
     final topCard = tableau.topCardThrow;
-    if (topCard == null) return false;
 
     // Must be opposite color and descending rank
     final isOppositeColor = (card.suit.isRed && topCard.suit.isBlack) ||

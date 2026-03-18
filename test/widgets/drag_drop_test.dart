@@ -184,7 +184,6 @@ void main() {
   group('DragTarget - FoundationPileWidget', () {
     testWidgets('accepts valid drop (ace on empty foundation)', (tester) async {
       final foundationPile = GamePile(type: PileType.foundations);
-      bool wasAccepted = false;
 
       await tester.pumpWidget(
         MaterialApp(
@@ -192,7 +191,7 @@ void main() {
             body: FoundationPileWidget(
               pile: foundationPile,
               foundationIndex: 0,
-              onDrop: (card, index) => wasAccepted = true,
+              onDrop: (card, index) {},
             ),
           ),
         ),
@@ -333,9 +332,6 @@ void main() {
       final tableauPile = GamePile(type: PileType.tableau);
       tableauPile.addCard(PlayingCard(suit: CardSuit.hearts, rank: CardRank.two, faceUp: true));
 
-      PlayingCard? droppedCard;
-      int? droppedFoundationIndex;
-
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -350,10 +346,7 @@ void main() {
                 FoundationPileWidget(
                   pile: aceHearts,
                   foundationIndex: 0,
-                  onDrop: (card, index) {
-                    droppedCard = card;
-                    droppedFoundationIndex = index;
-                  },
+                  onDrop: (card, index) {},
                 ),
               ],
             ),

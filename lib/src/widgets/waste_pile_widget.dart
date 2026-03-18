@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:solitaire/src/domain/game_pile.dart';
-import 'package:solitaire/src/domain/playing_card.dart';
 import 'package:solitaire/src/widgets/card_widget.dart';
 
 /// A widget that displays the waste pile.
