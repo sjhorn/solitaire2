@@ -19,9 +19,18 @@ class TableauPileWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      left: xOffset,
-      top: 0,
+    // Calculate the width and height needed for all cards
+    final cardCount = pile.cards.length;
+    final cardWidth = 80.0; // Standard card width
+    final cardHeight = 120.0; // Standard card height
+    final overlap = 30.0;
+
+    final totalWidth = cardCount > 0 ? cardWidth + (cardCount - 1) * overlap : cardWidth;
+    final totalHeight = cardCount > 0 ? cardHeight + (cardCount - 1) * overlap : cardHeight;
+
+    return SizedBox(
+      width: totalWidth,
+      height: totalHeight,
       child: Stack(
         children: pile.cards
             .asMap()
@@ -36,7 +45,23 @@ class TableauPileWidget extends StatelessWidget {
     return Positioned(
       left: index * 30, // Overlap cards horizontally
       top: index * 30, // Overlap cards vertically
-      child: CardWidget(card: card),
+      child: _buildDraggableCard(card, index),
     );
+  }
+
+  Widget _buildDraggableCard(PlayingCard card, int index) {
+    final isTopCard = index == pile.cards.length - 1;
+    final isFaceUp = card.faceUp;
+
+    if (isTopCard && isFaceUp) {
+      return Draggable<PlayingCard>(
+        data: card,
+        childWhenDragging: CardWidget(card: card),
+        feedback: CardWidget(card: card),
+        child: CardWidget(card: card),
+      );
+    }
+
+    return CardWidget(card: card);
   }
 }

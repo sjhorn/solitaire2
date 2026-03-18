@@ -27,12 +27,19 @@ class BoardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
+        final width = constraints.constrainWidth();
+        final height = constraints.constrainHeight();
+
+        // If constraints are unbounded, use default dimensions
+        final boardWidth = width.isFinite ? width : 800.0;
+        final boardHeight = height.isFinite ? height : 600.0;
+
         return Stack(
           children: [
             // Top row: Stock, Waste, gap, Foundations
-            _buildTopRow(constraints.maxWidth),
+            _buildTopRow(boardWidth),
             // Bottom row: 7 Tableau piles
-            _buildBottomRow(constraints.maxWidth, constraints.maxHeight),
+            _buildBottomRow(boardWidth, boardHeight),
           ],
         );
       },
@@ -40,6 +47,7 @@ class BoardWidget extends StatelessWidget {
   }
 
   Widget _buildTopRow(double boardWidth) {
+    final foundationPiles = gameState.foundationPiles;
     return Positioned(
       top: 20,
       left: (boardWidth - 600) / 2,
@@ -51,25 +59,30 @@ class BoardWidget extends StatelessWidget {
           WastePileWidget(pile: gameState.wastePile),
           // Gap
           const SizedBox(width: 60),
-          // Foundation piles
-          ...gameState.foundationPiles.asMap().entries.map(
-            (entry) => FoundationPileWidget(pile: entry.value),
-          ),
+          // Foundation piles (up to 4)
+          for (int i = 0; i < 4 && i < foundationPiles.length; i++)
+            FoundationPileWidget(pile: foundationPiles[i]),
         ],
       ),
     );
   }
 
   Widget _buildBottomRow(double boardWidth, double boardHeight) {
+    final tableauPiles = gameState.tableauPiles;
     return Positioned(
       top: 160,
       left: (boardWidth - 600) / 2,
-      child: Stack(
+      child: Row(
         children: List.generate(
           7,
-          (index) => TableauPileWidget(
-            pile: gameState.tableauPiles[index],
-            xOffset: index * 40,
+          (index) => SizedBox(
+            width: 80,
+            child: index < tableauPiles.length
+                ? TableauPileWidget(
+                    pile: tableauPiles[index],
+                    xOffset: 0,
+                  )
+                : const SizedBox.shrink(),
           ),
         ),
       ),
