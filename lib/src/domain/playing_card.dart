@@ -60,4 +60,19 @@ class PlayingCard {
     if (!faceUp) return 'Face-down card';
     return '${rank.toStringValue} of ${suit.symbol}';
   }
+
+  /// Returns a new PlayingCard with the specified fields.
+  PlayingCard copyWith({
+    CardSuit? suit,
+    CardRank? rank,
+    bool? faceUp,
+    bool? isSelected,
+  }) {
+    return PlayingCard(
+      suit: suit ?? this.suit,
+      rank: rank ?? this.rank,
+      faceUp: faceUp ?? this.faceUp,
+      isSelected: isSelected ?? this.isSelected,
+    );
+  }
 }
