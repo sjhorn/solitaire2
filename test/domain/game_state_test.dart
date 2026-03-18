@@ -1,4 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:solitaire/src/domain/deck.dart';
+import 'package:solitaire/src/domain/game_pile.dart';
 import 'package:solitaire/src/domain/game_state.dart';
 import 'package:solitaire/src/domain/pile_type.dart';
 
@@ -187,9 +189,27 @@ void main() {
 
     group('flip tableau card', () {
       test('returns null for empty tableau pile', () {
-        var state = GameState.initial();
-        state = state.drawFromStock(); // Create a non-empty waste pile
-        final result = state.flipTableauCard(6);
+        var state = GameState.createWithPiles(
+          deck: Deck(),
+          tableauPiles: [
+            GamePile(type: PileType.tableau),
+            GamePile(type: PileType.tableau),
+            GamePile(type: PileType.tableau),
+            GamePile(type: PileType.tableau),
+            GamePile(type: PileType.tableau),
+            GamePile(type: PileType.tableau),
+            GamePile(type: PileType.tableau),
+          ],
+          foundationPiles: [
+            GamePile(type: PileType.foundations),
+            GamePile(type: PileType.foundations),
+            GamePile(type: PileType.foundations),
+            GamePile(type: PileType.foundations),
+          ],
+          stockPile: GamePile(type: PileType.stock),
+          wastePile: GamePile(type: PileType.waste),
+        );
+        final result = state.flipTableauCard(0);
 
         expect(result, isNull);
       });
@@ -215,8 +235,27 @@ void main() {
 
     group('move tableau to foundation', () {
       test('returns null for empty tableau pile', () {
-        var state = GameState.initial();
-        final result = state.moveTableauToFoundation(6, 0);
+        var state = GameState.createWithPiles(
+          deck: Deck(),
+          tableauPiles: [
+            GamePile(type: PileType.tableau),
+            GamePile(type: PileType.tableau),
+            GamePile(type: PileType.tableau),
+            GamePile(type: PileType.tableau),
+            GamePile(type: PileType.tableau),
+            GamePile(type: PileType.tableau),
+            GamePile(type: PileType.tableau),
+          ],
+          foundationPiles: [
+            GamePile(type: PileType.foundations),
+            GamePile(type: PileType.foundations),
+            GamePile(type: PileType.foundations),
+            GamePile(type: PileType.foundations),
+          ],
+          stockPile: GamePile(type: PileType.stock),
+          wastePile: GamePile(type: PileType.waste),
+        );
+        final result = state.moveTableauToFoundation(0, 0);
 
         expect(result, isNull);
       });

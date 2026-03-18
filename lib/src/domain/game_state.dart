@@ -43,10 +43,9 @@ class GameState {
     for (var i = 0; i < 7; i++) {
       for (var j = 0; j <= i; j++) {
         final card = deck.draw();
-        if (j == i) {
-          card; // Make top card face-up
-        }
-        tableauPiles[i].addCard(card);
+        tableauPiles[i].addCard(
+          j == i ? card.copyWith(faceUp: true) : card,
+        );
       }
     }
 
@@ -122,7 +121,7 @@ class GameState {
 
     final card = _stockPile.removeTopCard();
     final newWaste = GamePile(type: PileType.waste);
-    newWaste.addCard(card);
+    newWaste.addCard(card.copyWith(faceUp: false));
 
     return GameState._(
       deck: _deck,
@@ -176,6 +175,10 @@ class GameState {
 
   /// Tries to move a card from tableau to foundation.
   GameState? moveTableauToFoundation(int tableauIndex, int foundationIndex) {
+    if (foundationIndex < 0 || foundationIndex >= _foundationPiles.length) {
+      return null;
+    }
+
     final tableau = _tableauPiles[tableauIndex];
     if (tableau.isEmpty) return null;
 

@@ -71,74 +71,84 @@ void main() {
     });
   });
 
-  group('BoardWidget', () {
-    testWidgets('renders with 7 tableau piles', (tester) async {
-      final tableauPiles = List.generate(
-        7,
-        (index) => GamePile(type: PileType.tableau),
+  testWidgets('BoardWidget renders with 7 tableau piles', (tester) async {
+    final tableauPiles = List.generate(
+      7,
+      (index) => GamePile(type: PileType.tableau),
+    );
+    for (var i = 0; i < 7; i++) {
+      tableauPiles[i].addCard(
+        PlayingCard(suit: CardSuit.hearts, rank: CardRank.ace, faceUp: true),
       );
-      for (var i = 0; i < 7; i++) {
-        tableauPiles[i].addCard(
-          PlayingCard(suit: CardSuit.hearts, rank: CardRank.ace, faceUp: true),
-        );
-      }
+    }
 
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: BoardWidget(
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SizedBox(
+            width: 800,
+            height: 600,
+            child: BoardWidget(
               gameState: _createGameState(tableauPiles),
               onStockTap: () {},
             ),
           ),
         ),
-      );
-      await tester.pump();
+      ),
+    );
+    await tester.pump();
 
-      expect(find.byType(TableauPileWidget), findsNWidgets(7));
-    });
+    expect(find.byType(TableauPileWidget), findsNWidgets(7));
+  });
 
-    testWidgets('renders with 4 foundation piles', (tester) async {
-      final foundationPiles = List.generate(
-        4,
-        (index) => GamePile(type: PileType.foundations),
-      );
+  testWidgets('BoardWidget renders with 4 foundation piles', (tester) async {
+    final foundationPiles = List.generate(
+      4,
+      (index) => GamePile(type: PileType.foundations),
+    );
 
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: BoardWidget(
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SizedBox(
+            width: 800,
+            height: 600,
+            child: BoardWidget(
               gameState: _createGameState([], foundationPiles),
               onStockTap: () {},
             ),
           ),
         ),
-      );
-      await tester.pump();
+      ),
+    );
+    await tester.pump();
 
-      expect(find.byType(FoundationPileWidget), findsNWidgets(4));
-    });
+    expect(find.byType(FoundationPileWidget), findsNWidgets(4));
+  });
 
-    testWidgets('renders stock and waste piles', (tester) async {
-      final tableauPiles = List.generate(7, (index) => GamePile(type: PileType.tableau));
-      final stockPile = GamePile(type: PileType.stock);
-      final wastePile = GamePile(type: PileType.waste);
+  testWidgets('BoardWidget renders stock and waste piles', (tester) async {
+    final tableauPiles = List.generate(7, (index) => GamePile(type: PileType.tableau));
+    final stockPile = GamePile(type: PileType.stock);
+    final wastePile = GamePile(type: PileType.waste);
 
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: BoardWidget(
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SizedBox(
+            width: 800,
+            height: 600,
+            child: BoardWidget(
               gameState: _createGameState(tableauPiles, [], stockPile, wastePile),
               onStockTap: () {},
             ),
           ),
         ),
-      );
-      await tester.pump();
+      ),
+    );
+    await tester.pump();
 
-      expect(find.byType(StockPileWidget), findsOneWidget);
-      expect(find.byType(WastePileWidget), findsOneWidget);
-    });
+    expect(find.byType(StockPileWidget), findsOneWidget);
+    expect(find.byType(WastePileWidget), findsOneWidget);
   });
 
   group('StockPileWidget', () {
@@ -253,8 +263,7 @@ void main() {
       );
       await tester.pump();
 
-      final container = tester.widget<Container>(find.byType(Container));
-      expect(container.child, isNotNull);
+      expect(find.byType(CardWidget), findsOneWidget);
     });
 
     testWidgets('displays top card correctly', (tester) async {
@@ -286,7 +295,11 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: TableauPileWidget(pile: pile, xOffset: 0),
+            body: SizedBox(
+              width: 800,
+              height: 600,
+              child: TableauPileWidget(pile: pile, xOffset: 0),
+            ),
           ),
         ),
       );
@@ -295,24 +308,28 @@ void main() {
       expect(find.byType(CardWidget), findsNWidgets(3));
     });
 
-    testWidgets('renders single card without Draggable', (tester) async {
+    testWidgets('renders single card with Draggable', (tester) async {
       final pile = GamePile(type: PileType.tableau);
       pile.addCard(PlayingCard(suit: CardSuit.diamonds, rank: CardRank.ten, faceUp: true));
 
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: TableauPileWidget(pile: pile, xOffset: 0),
+            body: SizedBox(
+              width: 800,
+              height: 600,
+              child: TableauPileWidget(pile: pile, xOffset: 0),
+            ),
           ),
         ),
       );
       await tester.pump();
 
-      // Top card should be draggable
-      expect(find.byType(Draggable), findsOneWidget);
+      // Top card should be draggable - check for Draggable widget wrapping CardWidget
+      expect(find.byType(Draggable<PlayingCard>), findsOneWidget);
     });
 
-    testWidgets('renders face-down cards without Draggable', (tester) async {
+    testWidgets('renders face-down cards with Draggable for top card', (tester) async {
       final pile = GamePile(type: PileType.tableau);
       pile.addCard(PlayingCard(suit: CardSuit.spades, rank: CardRank.ace, faceUp: false));
       pile.addCard(PlayingCard(suit: CardSuit.hearts, rank: CardRank.king, faceUp: true));
@@ -320,14 +337,18 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: TableauPileWidget(pile: pile, xOffset: 0),
+            body: SizedBox(
+              width: 800,
+              height: 600,
+              child: TableauPileWidget(pile: pile, xOffset: 0),
+            ),
           ),
         ),
       );
       await tester.pump();
 
       // Only top card should be draggable
-      expect(find.byType(Draggable), findsOneWidget);
+      expect(find.byType(Draggable<PlayingCard>), findsOneWidget);
     });
 
     testWidgets('positions cards with 30px overlap', (tester) async {
@@ -338,14 +359,17 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: TableauPileWidget(pile: pile, xOffset: 0),
+            body: SizedBox(
+              width: 800,
+              height: 600,
+              child: TableauPileWidget(pile: pile, xOffset: 0),
+            ),
           ),
         ),
       );
       await tester.pump();
 
-      final stacks = find.byType(Stack).evaluate().toList();
-      expect(stacks.length, 2); // One for the main widget, one for Draggable feedback
+      expect(find.byType(CardWidget), findsNWidgets(2));
     });
 
     testWidgets('shows correct number of cards for empty pile', (tester) async {
@@ -354,7 +378,11 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: TableauPileWidget(pile: pile, xOffset: 0),
+            body: SizedBox(
+              width: 800,
+              height: 600,
+              child: TableauPileWidget(pile: pile, xOffset: 0),
+            ),
           ),
         ),
       );
