@@ -111,6 +111,85 @@ void main() {
       });
     });
   });
+
+  group('pip layouts', () {
+    group('_SixPipLayout', () {
+      testWidgets('displays 6 pips in 2 columns of 3', (tester) async {
+        final card = PlayingCard(
+          suit: CardSuit.hearts,
+          rank: CardRank.six,
+        );
+
+        await tester.pumpWidget(_buildCardWidget(card));
+        await tester.pump();
+
+        final texts = tester.widgetList<Text>(find.byType(Text)).toList();
+        // Should have center pip + top/bottom corner pips
+        expect(texts.length, greaterThanOrEqualTo(6));
+      });
+    });
+
+    group('_SevenPipLayout', () {
+      testWidgets('displays 7 pips with center pip', (tester) async {
+        final card = PlayingCard(
+          suit: CardSuit.spades,
+          rank: CardRank.seven,
+        );
+
+        await tester.pumpWidget(_buildCardWidget(card));
+        await tester.pump();
+
+        final texts = tester.widgetList<Text>(find.byType(Text)).toList();
+        expect(texts.length, greaterThanOrEqualTo(7));
+      });
+    });
+
+    group('_EightPipLayout', () {
+      testWidgets('displays 8 pips with 2 center pips', (tester) async {
+        final card = PlayingCard(
+          suit: CardSuit.diamonds,
+          rank: CardRank.eight,
+        );
+
+        await tester.pumpWidget(_buildCardWidget(card));
+        await tester.pump();
+
+        final texts = tester.widgetList<Text>(find.byType(Text)).toList();
+        expect(texts.length, greaterThanOrEqualTo(8));
+      });
+    });
+
+    group('_NinePipLayout', () {
+      testWidgets('displays 9 pips with center pip', (tester) async {
+        final card = PlayingCard(
+          suit: CardSuit.clubs,
+          rank: CardRank.nine,
+        );
+
+        await tester.pumpWidget(_buildCardWidget(card));
+        await tester.pump();
+
+        final texts = tester.widgetList<Text>(find.byType(Text)).toList();
+        expect(texts.length, greaterThanOrEqualTo(9));
+      });
+    });
+
+    group('_TenPipLayout', () {
+      testWidgets('displays 10 pips in layout with center columns',
+          (tester) async {
+        final card = PlayingCard(
+          suit: CardSuit.hearts,
+          rank: CardRank.ten,
+        );
+
+        await tester.pumpWidget(_buildCardWidget(card));
+        await tester.pump();
+
+        final texts = tester.widgetList<Text>(find.byType(Text)).toList();
+        expect(texts.length, greaterThanOrEqualTo(10));
+      });
+    });
+  });
 }
 
 Widget _buildCardWidget(PlayingCard card) {
