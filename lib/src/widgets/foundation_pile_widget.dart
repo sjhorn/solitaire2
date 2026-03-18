@@ -26,12 +26,14 @@ class FoundationPileWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DragTarget<List<PlayingCard>>(
-      onWillAccept: (data) {
+      onWillAcceptWithDetails: (details) {
+        final data = details.data;
         if (data == null || data.isEmpty) return false;
         final card = data.first;
         return _isValidDrop(card);
       },
-      onAccept: (data) {
+      onAcceptWithDetails: (details) {
+        final data = details.data;
         if (data.isNotEmpty && onDrop != null) {
           onDrop!(data.first, foundationIndex);
         }
@@ -48,7 +50,7 @@ class FoundationPileWidget extends StatelessWidget {
               width: isDragOver ? 3 : 2,
             ),
             borderRadius: BorderRadius.circular(8),
-            color: isDragOver ? Colors.green.withOpacity(0.2) : null,
+            color: isDragOver ? Colors.green.withValues(alpha: 0.2) : null,
           ),
           child: Center(
             child: pile.isEmpty

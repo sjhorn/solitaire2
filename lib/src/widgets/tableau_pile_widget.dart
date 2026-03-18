@@ -43,12 +43,14 @@ class TableauPileWidget extends StatelessWidget {
     final totalHeight = cardCount > 0 ? cardHeight + (cardCount - 1) * overlap : cardHeight;
 
     return DragTarget<List<PlayingCard>>(
-      onWillAccept: (data) {
+      onWillAcceptWithDetails: (details) {
+        final data = details.data;
         if (data == null || data.isEmpty) return false;
         final card = data.first;
         return _isValidDrop(card);
       },
-      onAccept: (data) {
+      onAcceptWithDetails: (details) {
+        final data = details.data;
         if (data.isNotEmpty && onDrop != null) {
           onDrop!(data.first, tableauIndex);
         }
