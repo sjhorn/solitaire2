@@ -230,16 +230,9 @@ class _PipLayout extends StatelessWidget {
         return _NinePipLayout(suit: suit, color: color);
       case 10:
         return _TenPipLayout(suit: suit, color: color);
-      default:
-        return Text(
-          suit.symbol,
-          style: TextStyle(
-            fontSize: 36,
-            fontWeight: FontWeight.bold,
-            color: color,
-          ),
-        );
     }
+    // Should never reach here given CardRank values 1-13
+    throw UnsupportedError('Unsupported pip count: $pipCount');
   }
 }
 
