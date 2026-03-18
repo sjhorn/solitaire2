@@ -28,7 +28,7 @@ class FoundationPileWidget extends StatelessWidget {
     return DragTarget<List<PlayingCard>>(
       onWillAcceptWithDetails: (details) {
         final data = details.data;
-        if (data == null || data.isEmpty) return false;
+        if (data.isEmpty) return false;
         final card = data.first;
         return _isValidDrop(card);
       },
