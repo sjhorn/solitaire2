@@ -263,15 +263,21 @@ class GameState {
     if (_wastePile.isEmpty) return null;
 
     final card = _wastePile.topCardThrow;
-    final newWaste = GamePile(type: PileType.waste);
-    newWaste.addCards(_wastePile.cards);
-
-    final cards = newWaste.cards;
-    cards[cards.length - 1] = PlayingCard(
+    // Build new waste pile with flipped card
+    final newCards = <PlayingCard>[];
+    for (var i = 0; i < _wastePile.cards.length - 1; i++) {
+      newCards.add(_wastePile.cards[i]);
+    }
+    // Add flipped card
+    newCards.add(PlayingCard(
       suit: card.suit,
       rank: card.rank,
       faceUp: !card.faceUp,
-    );
+      isSelected: card.isSelected,
+    ));
+
+    final newWaste = GamePile(type: PileType.waste);
+    newWaste.addCards(newCards);
 
     return GameState._(
       deck: _deck,
