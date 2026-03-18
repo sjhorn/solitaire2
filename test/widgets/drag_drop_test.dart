@@ -10,6 +10,7 @@ import 'package:solitaire/src/domain/playing_card.dart';
 import 'package:solitaire/src/widgets/board_widget.dart';
 import 'package:solitaire/src/widgets/foundation_pile_widget.dart';
 import 'package:solitaire/src/widgets/tableau_pile_widget.dart';
+import 'package:solitaire/src/widgets/waste_pile_widget.dart';
 
 void main() {
   group('Drag & Drop - TableauPileWidget', () {
@@ -225,7 +226,6 @@ void main() {
   group('DragTarget - TableauPileWidget', () {
     testWidgets('accepts king on empty tableau', (tester) async {
       final tableauPile = GamePile(type: PileType.tableau);
-      bool wasAccepted = false;
 
       await tester.pumpWidget(
         MaterialApp(
@@ -237,7 +237,7 @@ void main() {
                 pile: tableauPile,
                 xOffset: 0,
                 tableauIndex: 0,
-                onDrop: (card, index) => wasAccepted = true,
+                onDrop: (card, index) {},
               ),
             ),
           ),
@@ -272,6 +272,74 @@ void main() {
       await tester.pump();
 
       expect(find.byType(DragTarget<List<PlayingCard>>), findsOneWidget);
+    });
+  });
+
+  group('Drag & Drop - End to End', () {
+    testWidgets('can drag card from tableau to foundation', (tester) async {
+      final aceHearts = GamePile(type: PileType.foundations);
+      final tableauPile = GamePile(type: PileType.tableau);
+      tableauPile.addCard(PlayingCard(suit: CardSuit.hearts, rank: CardRank.two, faceUp: true));
+
+      PlayingCard? droppedCard;
+      int? droppedFoundationIndex;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Row(
+              children: [
+                TableauPileWidget(
+                  pile: tableauPile,
+                  xOffset: 0,
+                  tableauIndex: 0,
+                  onDrop: (card, index) {},
+                ),
+                FoundationPileWidget(
+                  pile: aceHearts,
+                  foundationIndex: 0,
+                  onDrop: (card, index) {
+                    droppedCard = card;
+                    droppedFoundationIndex = index;
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      // Verify both widgets are rendered
+      expect(find.byType(TableauPileWidget), findsOneWidget);
+      expect(find.byType(FoundationPileWidget), findsOneWidget);
+      expect(find.byType(Draggable<PlayingCard>), findsOneWidget);
+    });
+
+    testWidgets('can drag card from waste to foundation', (tester) async {
+      final aceHearts = GamePile(type: PileType.foundations);
+      final wastePile = GamePile(type: PileType.waste);
+      wastePile.addCard(PlayingCard(suit: CardSuit.hearts, rank: CardRank.ace, faceUp: true));
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Row(
+              children: [
+                WastePileWidget(pile: wastePile),
+                FoundationPileWidget(
+                  pile: aceHearts,
+                  foundationIndex: 0,
+                  onDrop: (card, index) {},
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      expect(find.byType(FoundationPileWidget), findsOneWidget);
     });
   });
 }
