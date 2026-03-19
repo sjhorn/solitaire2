@@ -47,7 +47,21 @@ class _SolitaireHomeState extends State<SolitaireHome> {
 
   void _dropOnFoundation(PlayingCard card, int foundationIndex) {
     setState(() {
-      _gameState = _gameState.moveWasteToFoundation(foundationIndex) ?? _gameState;
+      // Try moving from waste to foundation
+      var newGameState = _gameState.moveWasteToFoundation(foundationIndex);
+      if (newGameState != null) {
+        _gameState = newGameState;
+        return;
+      }
+
+      // Try moving from tableau to foundation
+      for (var tableauIndex = 0; tableauIndex < 7; tableauIndex++) {
+        newGameState = _gameState.moveTableauToFoundation(tableauIndex, foundationIndex);
+        if (newGameState != null) {
+          _gameState = newGameState;
+          return;
+        }
+      }
     });
   }
 
@@ -59,8 +73,25 @@ class _SolitaireHomeState extends State<SolitaireHome> {
         _gameState = newGameState;
         return;
       }
-      // Note: Tableau-to-tableau and foundation-to-tableau moves
-      // require tracking the source of the drag, which is not yet implemented
+
+      // Try moving from foundation to tableau
+      for (var foundationIndex = 0; foundationIndex < 4; foundationIndex++) {
+        newGameState = _gameState.moveFoundationToTableau(foundationIndex, tableauIndex);
+        if (newGameState != null) {
+          _gameState = newGameState;
+          return;
+        }
+      }
+
+      // Try moving from one tableau to another
+      for (var fromTableauIndex = 0; fromTableauIndex < 7; fromTableauIndex++) {
+        if (fromTableauIndex == tableauIndex) continue;
+        newGameState = _gameState.moveTableauToTableau(fromTableauIndex, tableauIndex);
+        if (newGameState != null) {
+          _gameState = newGameState;
+          return;
+        }
+      }
     });
   }
 
