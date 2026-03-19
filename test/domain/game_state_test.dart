@@ -24,12 +24,12 @@ void main() {
         expect(state.tableauPiles[6].cards, hasLength(7));
       });
 
-      test('first tableau card in each pile is face-up', () {
+      test('top tableau card in each pile is face-up', () {
         final state = GameState.initial();
 
         for (final pile in state.tableauPiles) {
           if (pile.cards.isNotEmpty) {
-            expect(pile.cards.first.faceUp, isTrue);
+            expect(pile.cards.last.faceUp, isTrue);
           }
         }
       });
