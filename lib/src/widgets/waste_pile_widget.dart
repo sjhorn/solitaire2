@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:solitaire/src/domain/game_pile.dart';
+import 'package:solitaire/src/domain/playing_card.dart';
 import 'package:solitaire/src/widgets/card_widget.dart';
 
 /// A widget that displays the waste pile.
@@ -12,24 +13,66 @@ class WastePileWidget extends StatelessWidget {
   /// Callback when the waste pile is tapped.
   final VoidCallback? onTap;
 
-  const WastePileWidget({super.key, required this.pile, this.onTap});
+  /// Callback when a card is dropped on a target.
+  final Function(PlayingCard card)? onDrop;
+
+  const WastePileWidget({
+    super.key,
+    required this.pile,
+    this.onTap,
+    this.onDrop,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: pile.isEmpty ? null : onTap,
-      child: Container(
-        width: 80,
-        height: 120,
-        margin: const EdgeInsets.all(4),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey, width: 2),
-          borderRadius: BorderRadius.circular(8),
+    if (pile.isEmpty) {
+      return GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: 80,
+          height: 120,
+          margin: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey, width: 2),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: const SizedBox.shrink(),
         ),
-        child: pile.isEmpty
-            ? const SizedBox.shrink()
-            : CardWidget(card: pile.topCardThrow),
-      ),
+      );
+    }
+
+    final topCard = pile.topCardThrow;
+
+    return DragTarget<List<PlayingCard>>(
+      onWillAcceptWithDetails: (details) => false, // Don't allow dropping on waste
+      builder: (context, candidateData, rejectedData) {
+        return GestureDetector(
+          onTap: onTap,
+          child: Container(
+            width: 80,
+            height: 120,
+            margin: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey, width: 2),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Draggable<List<PlayingCard>>(
+              data: [topCard],
+              feedback: CardWidget(card: topCard, size: const Size(85, 130)),
+              childWhenDragging: Container(
+                width: 80,
+                height: 120,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1E3A5B),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.white, width: 2),
+                ),
+              ),
+              child: CardWidget(card: topCard),
+            ),
+          ),
+        );
+      },
     );
   }
 }
