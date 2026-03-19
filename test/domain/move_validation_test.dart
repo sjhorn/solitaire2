@@ -440,17 +440,20 @@ void main() {
     });
 
     test('moves stack of face-up cards to tableau', () {
-      final kingSpades = PlayingCard(suit: CardSuit.spades, rank: CardRank.king, faceUp: true);
+      final jackSpades = PlayingCard(suit: CardSuit.spades, rank: CardRank.jack, faceUp: true);
       final queenHearts = PlayingCard(suit: CardSuit.hearts, rank: CardRank.queen, faceUp: true);
       final jackClubs = PlayingCard(suit: CardSuit.clubs, rank: CardRank.jack, faceUp: true);
+      final tenDiamonds = PlayingCard(suit: CardSuit.diamonds, rank: CardRank.ten, faceUp: true);
 
       final tableauPiles = List.generate(
         7,
         (index) => GamePile(type: PileType.tableau),
       );
-      tableauPiles[0].addCard(kingSpades);
+      tableauPiles[0].addCard(jackSpades);
+      // Add stack: queen (red), jack (black), ten (red) - all face-up
       tableauPiles[1].addCard(queenHearts);
       tableauPiles[1].addCard(jackClubs);
+      tableauPiles[1].addCard(tenDiamonds);
 
       final state = GameState.createWithPiles(
         deck: Deck(),
@@ -460,10 +463,11 @@ void main() {
         wastePile: GamePile(type: PileType.waste),
       );
 
-      // Move stack from tableau 1 to tableau 0
+      // Move stack (ten, jack, queen) from tableau 1 to tableau 0 (jack)
+      // Ten (red, 10) on Jack (black, 11) is valid - alternating color and descending
       final newState = state.moveTableauToTableau(1, 0);
       expect(newState, isNotNull);
-      expect(newState?.tableauPiles[0].cards, hasLength(3));
+      expect(newState?.tableauPiles[0].cards, hasLength(4));
       expect(newState?.tableauPiles[1].isEmpty, isTrue);
     });
 
