@@ -100,7 +100,7 @@ class TableauPileWidget extends StatelessWidget {
         child: Draggable<List<PlayingCard>>(
           data: stack,
           feedback: _buildStackPreview(stack, true),
-          childWhenDragging: _buildStackPreview(stack, false),
+          childWhenDragging: _buildFaceDownPlaceholder(),
           child: GestureDetector(
             onTap: onAutoMove != null ? () => onAutoMove!(card) : null,
             child: cardWidget,
@@ -133,6 +133,19 @@ class TableauPileWidget extends StatelessWidget {
       }
     }
     return stack;
+  }
+
+  /// Builds a face-down card placeholder shown while dragging
+  Widget _buildFaceDownPlaceholder() {
+    return Container(
+      width: 80,
+      height: 120,
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E3A5B),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.white, width: 2),
+      ),
+    );
   }
 
   /// Builds a visual preview of the card stack for drag feedback
