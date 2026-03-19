@@ -216,4 +216,318 @@ void main() {
       ); // queen is now revealed face-up
     });
   });
+
+  group('Move Validation - Waste to Tableau', () {
+    test('moves waste card to empty tableau when King', () {
+      final kingCard = PlayingCard(suit: CardSuit.spades, rank: CardRank.king, faceUp: true);
+
+      final tableauPiles = List.generate(
+        7,
+        (index) => GamePile(type: PileType.tableau),
+      );
+
+      final foundationPiles = List.generate(
+        4,
+        (index) => GamePile(type: PileType.foundations),
+      );
+
+      final stockPile = GamePile(type: PileType.stock);
+      final wastePile = GamePile(type: PileType.waste)..addCard(kingCard);
+
+      final state = GameState.createWithPiles(
+        deck: Deck(),
+        tableauPiles: tableauPiles,
+        foundationPiles: foundationPiles,
+        stockPile: stockPile,
+        wastePile: wastePile,
+      );
+
+      final newState = state.moveWasteToTableau(0);
+      expect(newState, isNotNull);
+      expect(newState?.wastePile.isEmpty, isTrue);
+      expect(newState?.tableauPiles[0].cards, hasLength(1));
+      expect(newState?.tableauPiles[0].topCardThrow.rank, CardRank.king);
+    });
+
+    test('does not move non-King to empty tableau', () {
+      final queenCard = PlayingCard(suit: CardSuit.hearts, rank: CardRank.queen, faceUp: true);
+
+      final tableauPiles = List.generate(
+        7,
+        (index) => GamePile(type: PileType.tableau),
+      );
+
+      final state = GameState.createWithPiles(
+        deck: Deck(),
+        tableauPiles: tableauPiles,
+        foundationPiles: List.generate(4, (_) => GamePile(type: PileType.foundations)),
+        stockPile: GamePile(type: PileType.stock),
+        wastePile: GamePile(type: PileType.waste)..addCard(queenCard),
+      );
+
+      final newState = state.moveWasteToTableau(0);
+      expect(newState, isNull);
+    });
+
+    test('moves card to tableau with alternating color and descending rank', () {
+      final kingCard = PlayingCard(suit: CardSuit.spades, rank: CardRank.king, faceUp: true);
+      final queenHearts = PlayingCard(suit: CardSuit.hearts, rank: CardRank.queen, faceUp: true);
+
+      final tableauPiles = List.generate(
+        7,
+        (index) => GamePile(type: PileType.tableau),
+      );
+      tableauPiles[0].addCard(kingCard);
+
+      final state = GameState.createWithPiles(
+        deck: Deck(),
+        tableauPiles: tableauPiles,
+        foundationPiles: List.generate(4, (_) => GamePile(type: PileType.foundations)),
+        stockPile: GamePile(type: PileType.stock),
+        wastePile: GamePile(type: PileType.waste)..addCard(queenHearts),
+      );
+
+      final newState = state.moveWasteToTableau(0);
+      expect(newState, isNotNull);
+      expect(newState?.tableauPiles[0].cards, hasLength(2));
+      expect(newState?.wastePile.isEmpty, isTrue);
+    });
+
+    test('does not move card with same color to tableau', () {
+      final kingSpades = PlayingCard(suit: CardSuit.spades, rank: CardRank.king, faceUp: true);
+      final queenSpades = PlayingCard(suit: CardSuit.spades, rank: CardRank.queen, faceUp: true);
+
+      final tableauPiles = List.generate(
+        7,
+        (index) => GamePile(type: PileType.tableau),
+      );
+      tableauPiles[0].addCard(kingSpades);
+
+      final state = GameState.createWithPiles(
+        deck: Deck(),
+        tableauPiles: tableauPiles,
+        foundationPiles: List.generate(4, (_) => GamePile(type: PileType.foundations)),
+        stockPile: GamePile(type: PileType.stock),
+        wastePile: GamePile(type: PileType.waste)..addCard(queenSpades),
+      );
+
+      final newState = state.moveWasteToTableau(0);
+      expect(newState, isNull);
+    });
+
+    test('returns null when waste is empty', () {
+      final tableauPiles = List.generate(
+        7,
+        (index) => GamePile(type: PileType.tableau),
+      );
+
+      final state = GameState.createWithPiles(
+        deck: Deck(),
+        tableauPiles: tableauPiles,
+        foundationPiles: List.generate(4, (_) => GamePile(type: PileType.foundations)),
+        stockPile: GamePile(type: PileType.stock),
+        wastePile: GamePile(type: PileType.waste),
+      );
+
+      final newState = state.moveWasteToTableau(0);
+      expect(newState, isNull);
+    });
+  });
+
+  group('Move Validation - Foundation to Tableau', () {
+    test('moves card from foundation to empty tableau when King', () {
+      final kingCard = PlayingCard(suit: CardSuit.spades, rank: CardRank.king, faceUp: true);
+
+      final foundationPiles = List.generate(
+        4,
+        (index) => GamePile(type: PileType.foundations),
+      );
+      foundationPiles[0].addCard(kingCard);
+
+      final tableauPiles = List.generate(
+        7,
+        (index) => GamePile(type: PileType.tableau),
+      );
+
+      final state = GameState.createWithPiles(
+        deck: Deck(),
+        tableauPiles: tableauPiles,
+        foundationPiles: foundationPiles,
+        stockPile: GamePile(type: PileType.stock),
+        wastePile: GamePile(type: PileType.waste),
+      );
+
+      final newState = state.moveFoundationToTableau(0, 0);
+      expect(newState, isNotNull);
+      expect(newState?.foundationPiles[0].isEmpty, isTrue);
+      expect(newState?.tableauPiles[0].cards, hasLength(1));
+    });
+
+    test('moves card from foundation to tableau with alternating color', () {
+      final kingSpades = PlayingCard(suit: CardSuit.spades, rank: CardRank.king, faceUp: true);
+      final queenHearts = PlayingCard(suit: CardSuit.hearts, rank: CardRank.queen, faceUp: true);
+
+      final foundationPiles = List.generate(
+        4,
+        (index) => GamePile(type: PileType.foundations),
+      );
+      foundationPiles[0].addCard(queenHearts);
+
+      final tableauPiles = List.generate(
+        7,
+        (index) => GamePile(type: PileType.tableau),
+      );
+      tableauPiles[0].addCard(kingSpades);
+
+      final state = GameState.createWithPiles(
+        deck: Deck(),
+        tableauPiles: tableauPiles,
+        foundationPiles: foundationPiles,
+        stockPile: GamePile(type: PileType.stock),
+        wastePile: GamePile(type: PileType.waste),
+      );
+
+      final newState = state.moveFoundationToTableau(0, 0);
+      expect(newState, isNotNull);
+      expect(newState?.foundationPiles[0].isEmpty, isTrue);
+      expect(newState?.tableauPiles[0].cards, hasLength(2));
+    });
+
+    test('returns null when foundation is empty', () {
+      final tableauPiles = List.generate(
+        7,
+        (index) => GamePile(type: PileType.tableau),
+      );
+
+      final state = GameState.createWithPiles(
+        deck: Deck(),
+        tableauPiles: tableauPiles,
+        foundationPiles: List.generate(4, (_) => GamePile(type: PileType.foundations)),
+        stockPile: GamePile(type: PileType.stock),
+        wastePile: GamePile(type: PileType.waste),
+      );
+
+      final newState = state.moveFoundationToTableau(0, 0);
+      expect(newState, isNull);
+    });
+  });
+
+  group('Move Validation - Tableau to Tableau', () {
+    test('moves single face-up card to tableau with alternating color', () {
+      final kingSpades = PlayingCard(suit: CardSuit.spades, rank: CardRank.king, faceUp: true);
+      final queenHearts = PlayingCard(suit: CardSuit.hearts, rank: CardRank.queen, faceUp: true);
+
+      final tableauPiles = List.generate(
+        7,
+        (index) => GamePile(type: PileType.tableau),
+      );
+      tableauPiles[0].addCard(kingSpades);
+      tableauPiles[1].addCard(queenHearts);
+
+      final state = GameState.createWithPiles(
+        deck: Deck(),
+        tableauPiles: tableauPiles,
+        foundationPiles: List.generate(4, (_) => GamePile(type: PileType.foundations)),
+        stockPile: GamePile(type: PileType.stock),
+        wastePile: GamePile(type: PileType.waste),
+      );
+
+      // Move from tableau 1 to tableau 0
+      final newState = state.moveTableauToTableau(1, 0);
+      expect(newState, isNotNull);
+      expect(newState?.tableauPiles[0].cards, hasLength(2));
+      expect(newState?.tableauPiles[1].isEmpty, isTrue);
+    });
+
+    test('moves stack of face-up cards to tableau', () {
+      final kingSpades = PlayingCard(suit: CardSuit.spades, rank: CardRank.king, faceUp: true);
+      final queenHearts = PlayingCard(suit: CardSuit.hearts, rank: CardRank.queen, faceUp: true);
+      final jackClubs = PlayingCard(suit: CardSuit.clubs, rank: CardRank.jack, faceUp: true);
+
+      final tableauPiles = List.generate(
+        7,
+        (index) => GamePile(type: PileType.tableau),
+      );
+      tableauPiles[0].addCard(kingSpades);
+      tableauPiles[1].addCard(queenHearts);
+      tableauPiles[1].addCard(jackClubs);
+
+      final state = GameState.createWithPiles(
+        deck: Deck(),
+        tableauPiles: tableauPiles,
+        foundationPiles: List.generate(4, (_) => GamePile(type: PileType.foundations)),
+        stockPile: GamePile(type: PileType.stock),
+        wastePile: GamePile(type: PileType.waste),
+      );
+
+      // Move stack from tableau 1 to tableau 0
+      final newState = state.moveTableauToTableau(1, 0);
+      expect(newState, isNotNull);
+      expect(newState?.tableauPiles[0].cards, hasLength(3));
+      expect(newState?.tableauPiles[1].isEmpty, isTrue);
+    });
+
+    test('does not move to same tableau', () {
+      final kingCard = PlayingCard(suit: CardSuit.spades, rank: CardRank.king, faceUp: true);
+
+      final tableauPiles = List.generate(
+        7,
+        (index) => GamePile(type: PileType.tableau),
+      );
+      tableauPiles[0].addCard(kingCard);
+
+      final state = GameState.createWithPiles(
+        deck: Deck(),
+        tableauPiles: tableauPiles,
+        foundationPiles: List.generate(4, (_) => GamePile(type: PileType.foundations)),
+        stockPile: GamePile(type: PileType.stock),
+        wastePile: GamePile(type: PileType.waste),
+      );
+
+      final newState = state.moveTableauToTableau(0, 0);
+      expect(newState, isNull);
+    });
+
+    test('does not move from empty tableau', () {
+      final tableauPiles = List.generate(
+        7,
+        (index) => GamePile(type: PileType.tableau),
+      );
+
+      final state = GameState.createWithPiles(
+        deck: Deck(),
+        tableauPiles: tableauPiles,
+        foundationPiles: List.generate(4, (_) => GamePile(type: PileType.foundations)),
+        stockPile: GamePile(type: PileType.stock),
+        wastePile: GamePile(type: PileType.waste),
+      );
+
+      final newState = state.moveTableauToTableau(0, 1);
+      expect(newState, isNull);
+    });
+
+    test('does not move invalid card to tableau', () {
+      final kingSpades = PlayingCard(suit: CardSuit.spades, rank: CardRank.king, faceUp: true);
+      final jackSpades = PlayingCard(suit: CardSuit.spades, rank: CardRank.jack, faceUp: true);
+
+      final tableauPiles = List.generate(
+        7,
+        (index) => GamePile(type: PileType.tableau),
+      );
+      tableauPiles[0].addCard(kingSpades);
+      tableauPiles[1].addCard(jackSpades);
+
+      final state = GameState.createWithPiles(
+        deck: Deck(),
+        tableauPiles: tableauPiles,
+        foundationPiles: List.generate(4, (_) => GamePile(type: PileType.foundations)),
+        stockPile: GamePile(type: PileType.stock),
+        wastePile: GamePile(type: PileType.waste),
+      );
+
+      // Same color - should fail
+      final newState = state.moveTableauToTableau(1, 0);
+      expect(newState, isNull);
+    });
+  });
 }
