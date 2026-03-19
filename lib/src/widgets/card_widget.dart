@@ -120,7 +120,7 @@ class CardWidget extends StatelessWidget {
       return Text(
         card.suit.symbol,
         style: TextStyle(
-          fontSize: size.width * 0.6,
+          fontSize: size.width * 0.5,
           fontWeight: FontWeight.bold,
           color: color,
         ),
@@ -210,7 +210,7 @@ class _PipLayout extends StatelessWidget {
     required this.size,
   });
 
-  double get _pipSize => size.width * 0.18;
+  double get _pipSize => size.width * 0.10;
 
   @override
   Widget build(BuildContext context) {
@@ -238,7 +238,6 @@ class _PipLayout extends StatelessWidget {
       case 10:
         return _TenPipLayout(suit: suit, color: color, pipSize: _pipSize);
     }
-    // Should never reach here given CardRank values 1-13
     throw UnsupportedError('Unsupported pip count: $pipCount');
   }
 }
@@ -255,7 +254,7 @@ class _SinglePip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       suit.symbol,
-      style: TextStyle(fontSize: pipSize * 2, fontWeight: FontWeight.bold, color: color),
+      style: TextStyle(fontSize: pipSize * 2.2, fontWeight: FontWeight.bold, color: color),
     );
   }
 }
@@ -272,9 +271,10 @@ class _TwoPipLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
       children: [
         Text(suit.symbol, style: _pipStyle()),
-        SizedBox(height: pipSize),
+        SizedBox(height: pipSize * 0.8),
         Text(suit.symbol, style: _pipStyle()),
       ],
     );
@@ -283,7 +283,7 @@ class _TwoPipLayout extends StatelessWidget {
   TextStyle _pipStyle() => TextStyle(fontSize: pipSize, fontWeight: FontWeight.bold, color: color);
 }
 
-/// Layout for 3 pips (vertical with center).
+/// Layout for 3 pips (vertical).
 class _ThreePipLayout extends StatelessWidget {
   final CardSuit suit;
   final Color color;
@@ -295,11 +295,12 @@ class _ThreePipLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
       children: [
         Text(suit.symbol, style: _pipStyle()),
-        SizedBox(height: pipSize),
+        SizedBox(height: pipSize * 0.5),
         Text(suit.symbol, style: _pipStyle()),
-        SizedBox(height: pipSize),
+        SizedBox(height: pipSize * 0.5),
         Text(suit.symbol, style: _pipStyle()),
       ],
     );
@@ -318,13 +319,17 @@ class _FourPipLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Positioned(left: 0, top: 0, child: Text(suit.symbol, style: _pipStyle())),
-        Positioned(right: 0, top: 0, child: Text(suit.symbol, style: _pipStyle())),
-        Positioned(left: 0, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
-        Positioned(right: 0, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
-      ],
+    return SizedBox(
+      width: pipSize * 2.5,
+      height: pipSize * 2.5,
+      child: Stack(
+        children: [
+          Positioned(left: 0, top: 0, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(right: 0, top: 0, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(left: 0, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(right: 0, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
+        ],
+      ),
     );
   }
 
@@ -341,14 +346,18 @@ class _FivePipLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Positioned(left: 0, top: 0, child: Text(suit.symbol, style: _pipStyle())),
-        Positioned(right: 0, top: 0, child: Text(suit.symbol, style: _pipStyle())),
-        Positioned(left: 0, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
-        Positioned(right: 0, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
-        Center(child: Text(suit.symbol, style: _pipStyle())),
-      ],
+    return SizedBox(
+      width: pipSize * 2.5,
+      height: pipSize * 2.5,
+      child: Stack(
+        children: [
+          Positioned(left: 0, top: 0, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(right: 0, top: 0, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(left: 0, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(right: 0, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
+          Center(child: Text(suit.symbol, style: _pipStyle())),
+        ],
+      ),
     );
   }
 
@@ -365,25 +374,28 @@ class _SixPipLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: List.filled(3, Text(suit.symbol, style: _pipStyle())),
-        ),
-        Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: List.filled(3, Text(suit.symbol, style: _pipStyle())),
-        ),
-      ],
+    return SizedBox(
+      width: pipSize * 2.8,
+      height: pipSize * 3.0,
+      child: Stack(
+        children: [
+          // Left column
+          Positioned(left: 0, top: 0, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(left: 0, top: pipSize * 0.9, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(left: 0, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
+          // Right column
+          Positioned(right: 0, top: 0, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(right: 0, top: pipSize * 0.9, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(right: 0, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
+        ],
+      ),
     );
   }
 
   TextStyle _pipStyle() => TextStyle(fontSize: pipSize, fontWeight: FontWeight.bold, color: color);
 }
 
-/// Layout for 7 pips (2 columns of 3 + 1 center).
+/// Layout for 7 pips.
 class _SevenPipLayout extends StatelessWidget {
   final CardSuit suit;
   final Color color;
@@ -393,23 +405,30 @@ class _SevenPipLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Positioned(left: 0, top: pipSize, child: Text(suit.symbol, style: _pipStyle())),
-        Positioned(left: 0, bottom: pipSize, child: Text(suit.symbol, style: _pipStyle())),
-        Positioned(left: pipSize, top: 0, child: Text(suit.symbol, style: _pipStyle())),
-        Positioned(right: 0, top: pipSize, child: Text(suit.symbol, style: _pipStyle())),
-        Positioned(right: 0, bottom: pipSize, child: Text(suit.symbol, style: _pipStyle())),
-        Positioned(right: pipSize, top: 0, child: Text(suit.symbol, style: _pipStyle())),
-        Center(child: Text(suit.symbol, style: _pipStyle())),
-      ],
+    return SizedBox(
+      width: pipSize * 2.8,
+      height: pipSize * 2.8,
+      child: Stack(
+        children: [
+          // Left column (top, middle, bottom)
+          Positioned(left: 0, top: 0, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(left: 0, top: pipSize * 0.9, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(left: 0, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
+          // Right column (top, middle, bottom)
+          Positioned(right: 0, top: 0, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(right: 0, top: pipSize * 0.9, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(right: 0, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
+          // Center
+          Center(child: Text(suit.symbol, style: _pipStyle())),
+        ],
+      ),
     );
   }
 
   TextStyle _pipStyle() => TextStyle(fontSize: pipSize, fontWeight: FontWeight.bold, color: color);
 }
 
-/// Layout for 8 pips (2 columns of 3 + 2 center).
+/// Layout for 8 pips.
 class _EightPipLayout extends StatelessWidget {
   final CardSuit suit;
   final Color color;
@@ -419,24 +438,31 @@ class _EightPipLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Positioned(left: 0, top: 0, child: Text(suit.symbol, style: _pipStyle())),
-        Positioned(left: 0, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
-        Positioned(left: pipSize, top: pipSize, child: Text(suit.symbol, style: _pipStyle())),
-        Positioned(left: pipSize, bottom: pipSize, child: Text(suit.symbol, style: _pipStyle())),
-        Positioned(right: 0, top: 0, child: Text(suit.symbol, style: _pipStyle())),
-        Positioned(right: 0, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
-        Positioned(right: pipSize, top: pipSize, child: Text(suit.symbol, style: _pipStyle())),
-        Positioned(right: pipSize, bottom: pipSize, child: Text(suit.symbol, style: _pipStyle())),
-      ],
+    return SizedBox(
+      width: pipSize * 2.8,
+      height: pipSize * 2.8,
+      child: Stack(
+        children: [
+          // Left column
+          Positioned(left: 0, top: 0, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(left: 0, top: pipSize * 0.9, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(left: 0, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
+          // Right column
+          Positioned(right: 0, top: 0, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(right: 0, top: pipSize * 0.9, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(right: 0, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
+          // Center column (2 pips)
+          Positioned(left: pipSize * 0.9, top: pipSize * 0.3, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(right: pipSize * 0.9, bottom: pipSize * 0.3, child: Text(suit.symbol, style: _pipStyle())),
+        ],
+      ),
     );
   }
 
   TextStyle _pipStyle() => TextStyle(fontSize: pipSize, fontWeight: FontWeight.bold, color: color);
 }
 
-/// Layout for 9 pips (4 corners + 4 middle + 1 center).
+/// Layout for 9 pips.
 class _NinePipLayout extends StatelessWidget {
   final CardSuit suit;
   final Color color;
@@ -446,25 +472,32 @@ class _NinePipLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Positioned(left: 0, top: 0, child: Text(suit.symbol, style: _pipStyle())),
-        Positioned(left: 0, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
-        Positioned(left: pipSize, top: 0, child: Text(suit.symbol, style: _pipStyle())),
-        Positioned(left: pipSize, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
-        Positioned(right: 0, top: 0, child: Text(suit.symbol, style: _pipStyle())),
-        Positioned(right: 0, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
-        Positioned(right: pipSize, top: 0, child: Text(suit.symbol, style: _pipStyle())),
-        Positioned(right: pipSize, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
-        Center(child: Text(suit.symbol, style: _pipStyle())),
-      ],
+    return SizedBox(
+      width: pipSize * 2.8,
+      height: pipSize * 2.8,
+      child: Stack(
+        children: [
+          // Left column (3)
+          Positioned(left: 0, top: 0, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(left: 0, top: pipSize * 0.9, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(left: 0, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
+          // Right column (3)
+          Positioned(right: 0, top: 0, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(right: 0, top: pipSize * 0.9, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(right: 0, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
+          // Center column (2 + 1 center)
+          Positioned(left: pipSize * 0.9, top: 0, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(right: pipSize * 0.9, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
+          Center(child: Text(suit.symbol, style: _pipStyle())),
+        ],
+      ),
     );
   }
 
   TextStyle _pipStyle() => TextStyle(fontSize: pipSize, fontWeight: FontWeight.bold, color: color);
 }
 
-/// Layout for 10 pips (4 corners + 6 middle).
+/// Layout for 10 pips.
 class _TenPipLayout extends StatelessWidget {
   final CardSuit suit;
   final Color color;
@@ -474,19 +507,27 @@ class _TenPipLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Positioned(left: 0, top: 0, child: Text(suit.symbol, style: _pipStyle())),
-        Positioned(left: 0, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
-        Positioned(left: pipSize, top: pipSize, child: Text(suit.symbol, style: _pipStyle())),
-        Positioned(left: pipSize, bottom: pipSize, child: Text(suit.symbol, style: _pipStyle())),
-        Positioned(right: 0, top: 0, child: Text(suit.symbol, style: _pipStyle())),
-        Positioned(right: 0, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
-        Positioned(right: pipSize, top: pipSize, child: Text(suit.symbol, style: _pipStyle())),
-        Positioned(right: pipSize, bottom: pipSize, child: Text(suit.symbol, style: _pipStyle())),
-        Positioned(left: pipSize * 1.5, top: 0, child: Text(suit.symbol, style: _pipStyle())),
-        Positioned(left: pipSize * 1.5, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
-      ],
+    return SizedBox(
+      width: pipSize * 3.0,
+      height: pipSize * 2.8,
+      child: Stack(
+        children: [
+          // Left column (3)
+          Positioned(left: 0, top: 0, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(left: 0, top: pipSize * 0.9, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(left: 0, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
+          // Right column (3)
+          Positioned(right: 0, top: 0, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(right: 0, top: pipSize * 0.9, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(right: 0, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
+          // Middle left (2)
+          Positioned(left: pipSize * 0.7, top: pipSize * 0.3, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(left: pipSize * 0.7, bottom: pipSize * 0.3, child: Text(suit.symbol, style: _pipStyle())),
+          // Middle right (2)
+          Positioned(right: pipSize * 0.7, top: pipSize * 0.3, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(right: pipSize * 0.7, bottom: pipSize * 0.3, child: Text(suit.symbol, style: _pipStyle())),
+        ],
+      ),
     );
   }
 
