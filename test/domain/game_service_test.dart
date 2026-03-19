@@ -1,7 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:solitaire/src/domain/game_score.dart';
 import 'package:solitaire/src/domain/game_service.dart';
-import 'package:solitaire/src/domain/game_state.dart';
 import 'package:solitaire/src/domain/game_state_options.dart';
 
 void main() {
@@ -44,7 +42,6 @@ void main() {
 
     test('undo reverts the game state', () {
       final service = GameService.newGame();
-      final stateBefore = service.gameState;
       service.drawCard();
       service.undo();
 
