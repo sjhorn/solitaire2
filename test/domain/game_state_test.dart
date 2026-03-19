@@ -1,7 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:solitaire/src/domain/card_rank.dart';
+import 'package:solitaire/src/domain/card_suit.dart';
 import 'package:solitaire/src/domain/deck.dart';
 import 'package:solitaire/src/domain/game_pile.dart';
 import 'package:solitaire/src/domain/game_state.dart';
+import 'package:solitaire/src/domain/playing_card.dart';
 import 'package:solitaire/src/domain/pile_type.dart';
 
 void main() {
@@ -268,8 +271,31 @@ void main() {
       });
 
       test('returns null when move is invalid', () {
-        var state = GameState.initial();
-        // Try to move 7 of spades to empty foundation (only ace is valid)
+        // Create a controlled state with a known non-ace card in tableau
+        final deck = Deck();
+        deck.shuffle();
+
+        final tableauPiles = List.generate(
+          7,
+          (index) => GamePile(type: PileType.tableau),
+        );
+        // Add a King (not an ace) to the first tableau pile
+        tableauPiles[0].addCard(PlayingCard(suit: CardSuit.spades, rank: CardRank.king, faceUp: true));
+
+        final foundationPiles = List.generate(
+          4,
+          (index) => GamePile(type: PileType.foundations),
+        );
+
+        final state = GameState.createWithPiles(
+          deck: deck,
+          tableauPiles: tableauPiles,
+          foundationPiles: foundationPiles,
+          stockPile: GamePile(type: PileType.stock),
+          wastePile: GamePile(type: PileType.waste),
+        );
+
+        // Try to move King to empty foundation (only ace is valid)
         final result = state.moveTableauToFoundation(0, 0);
 
         expect(result, isNull);
