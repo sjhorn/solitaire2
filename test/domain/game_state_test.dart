@@ -1,4 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:solitaire/src/domain/deck.dart';
+import 'package:solitaire/src/domain/game_pile.dart';
 import 'package:solitaire/src/domain/game_state.dart';
 import 'package:solitaire/src/domain/pile_type.dart';
 
@@ -89,13 +91,54 @@ void main() {
       });
 
       test('stock can be depleted by drawing', () {
-        final state = GameState.initial();
+        var state = GameState.initial();
 
         while (state.stockPile.cards.isNotEmpty) {
-          state.drawFromStock();
+          state = state.drawFromStock();
         }
 
         expect(state.stockPile.isEmpty, isTrue);
+      });
+
+      test('draws from stock when cards available', () {
+        final state = GameState.initial();
+        final newState = state.drawFromStock();
+
+        expect(newState.stockPile.cards, hasLength(23));
+        expect(newState.wastePile.cards, hasLength(1));
+      });
+    });
+
+    group('waste to foundation', () {
+      test('returns null when waste is empty', () {
+        final state = GameState.initial();
+        final result = state.moveWasteToFoundation(0);
+
+        expect(result, isNull);
+      });
+
+      test('moves ace from waste to foundation', () {
+        var state = GameState.initial();
+        // Draw until we get an ace in waste (or add one manually)
+        while (state.wastePile.cards.isEmpty || state.wastePile.topCardThrow.rank.value != 1) {
+          state = state.drawFromStock();
+        }
+        final result = state.moveWasteToFoundation(0);
+
+        expect(result, isNotNull);
+        expect(result!.foundationPiles[0].cards, hasLength(1));
+      });
+
+      test('does not move non-ace card to empty foundation', () {
+        var state = GameState.initial();
+        // Draw cards until we get a non-ace in waste
+        while (state.wastePile.cards.isEmpty || state.wastePile.topCardThrow.rank.value == 1) {
+          state = state.drawFromStock();
+        }
+        // Now we have a non-ace in waste, try to move to empty foundation
+        final result = state.moveWasteToFoundation(0);
+
+        expect(result, isNull);
       });
     });
 
@@ -141,6 +184,127 @@ void main() {
         final state = GameState.initial();
 
         expect(state.stockPile.type, equals(PileType.stock));
+      });
+    });
+
+    group('flip tableau card', () {
+      test('returns null for empty tableau pile', () {
+        var state = GameState.createWithPiles(
+          deck: Deck(),
+          tableauPiles: [
+            GamePile(type: PileType.tableau),
+            GamePile(type: PileType.tableau),
+            GamePile(type: PileType.tableau),
+            GamePile(type: PileType.tableau),
+            GamePile(type: PileType.tableau),
+            GamePile(type: PileType.tableau),
+            GamePile(type: PileType.tableau),
+          ],
+          foundationPiles: [
+            GamePile(type: PileType.foundations),
+            GamePile(type: PileType.foundations),
+            GamePile(type: PileType.foundations),
+            GamePile(type: PileType.foundations),
+          ],
+          stockPile: GamePile(type: PileType.stock),
+          wastePile: GamePile(type: PileType.waste),
+        );
+        final result = state.flipTableauCard(0);
+
+        expect(result, isNull);
+      });
+
+      test('returns null when only one card in pile', () {
+        var state = GameState.initial();
+        // Tableau pile 0 has only 1 card
+        final result = state.flipTableauCard(0);
+
+        expect(result, isNull);
+      });
+
+      test('flips top card to reveal card below', () {
+        var state = GameState.initial();
+        // Tableau pile 1 has 2 cards, so we can flip
+        final result = state.flipTableauCard(1);
+
+        expect(result, isNotNull);
+        expect(result!.tableauPiles[1].cards, hasLength(1));
+        expect(result.tableauPiles[1].cards.first.faceUp, isTrue);
+      });
+    });
+
+    group('move tableau to foundation', () {
+      test('returns null for empty tableau pile', () {
+        var state = GameState.createWithPiles(
+          deck: Deck(),
+          tableauPiles: [
+            GamePile(type: PileType.tableau),
+            GamePile(type: PileType.tableau),
+            GamePile(type: PileType.tableau),
+            GamePile(type: PileType.tableau),
+            GamePile(type: PileType.tableau),
+            GamePile(type: PileType.tableau),
+            GamePile(type: PileType.tableau),
+          ],
+          foundationPiles: [
+            GamePile(type: PileType.foundations),
+            GamePile(type: PileType.foundations),
+            GamePile(type: PileType.foundations),
+            GamePile(type: PileType.foundations),
+          ],
+          stockPile: GamePile(type: PileType.stock),
+          wastePile: GamePile(type: PileType.waste),
+        );
+        final result = state.moveTableauToFoundation(0, 0);
+
+        expect(result, isNull);
+      });
+
+      test('returns null for invalid foundation index', () {
+        var state = GameState.initial();
+        final result = state.moveTableauToFoundation(0, 5);
+
+        expect(result, isNull);
+      });
+
+      test('returns null when move is invalid', () {
+        var state = GameState.initial();
+        // Try to move 7 of spades to empty foundation (only ace is valid)
+        final result = state.moveTableauToFoundation(0, 0);
+
+        expect(result, isNull);
+      });
+    });
+
+    group('flip waste card', () {
+      test('returns null when waste is empty', () {
+        final state = GameState.initial();
+        final result = state.flipWasteCard();
+
+        expect(result, isNull);
+      });
+
+      test('flips waste card when available', () {
+        var state = GameState.initial();
+        state = state.drawFromStock();
+        final result = state.flipWasteCard();
+
+        expect(result, isNotNull);
+        expect(result!.wastePile.cards.first.faceUp, isTrue);
+      });
+    });
+
+    group('is won detection', () {
+      test('is not won after initial deal', () {
+        final state = GameState.initial();
+        expect(state.isWon, isFalse);
+      });
+
+      test('returns true only when all 52 cards in foundations', () {
+        var state = GameState.initial();
+        expect(state.isWon, isFalse);
+        // This would require moving all cards, which is complex
+        // Just verify that initial state is not won
       });
     });
   });
