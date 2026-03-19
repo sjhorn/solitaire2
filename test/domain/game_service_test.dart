@@ -135,9 +135,9 @@ void main() {
       expect(service.moveWasteToFoundation, isA<Function>());
     });
 
-    test('moveTableauToFoundation returns null for invalid move', () {
+    test('moveTableauToFoundation returns null for invalid foundation index', () {
       final service = GameService.newGame();
-      final result = service.moveTableauToFoundation(0, 0);
+      final result = service.moveTableauToFoundation(0, 5); // Invalid foundation index
 
       expect(result, isNull);
     });
