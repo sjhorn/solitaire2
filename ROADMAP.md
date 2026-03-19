@@ -2,7 +2,7 @@
 
 A phased plan for building a fully-featured Klondike Solitaire game in Flutter with drag-and-drop, rich card visuals, and polished UX.
 
-**Current Status:** Phase 7 Complete — Ready for Phase 8 (Audio & Haptics)
+**Current Status:** Phase 7 Complete — Ready for Phase 8 (Audio & Haptics) | Coverage: 92.1%
 
 ---
 
