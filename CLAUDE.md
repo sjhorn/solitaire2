@@ -24,8 +24,10 @@ Key github tools used in workflow:
 ---
 
 ## Rules
-
-- Never use `git`, `gh`, `dart`, or `flutter` CLI — use MCP equivalents
+- Always ensure you have pulled that latest from remote git into master when we begin a git branch
+- Never push directly to main or master branch you must create a branch and pull request
+- Never push before running the test suit and confirming all tests, coverage and analysis pass as for the github action
+- Never use `git`, `gh`, `dart`, or `flutter` CLI and commands directly instead use MCP equivalents
 - Never use shell operators: `>` `>>` `2>&1` `&&` `||` `$()` `|` — one simple command per Bash call
 - Use Claude native tools (Read, Edit, Write, Glob, Grep) for file operations
 - Never push to `main` directly
@@ -65,6 +67,7 @@ Run via `mcp__dart__*`, confirm failure. Check off RED tasks.
 ### 4. GREEN — Make It Pass
 Write **minimal** implementation. Run full suite via `mcp__dart__*`.
 All green, no regressions. Check off GREEN tasks.
+Ensure our test coverage is above 90% via `flutter test --coverage 2>&1:*`
 
 ### 5. Commit & PR
 `mcp__server-git__git_add` + `git_commit`: `feat: <description> (closes #<N>)`
@@ -93,7 +96,7 @@ Entities: immutable, `final` fields, factory constructors.
 PR merge requires all checks green (`.github/workflows/ci.yml`):
 - `dart analyze` — zero issues
 - `flutter test` — all pass
-- Coverage >= 90%
+- `flutter test --coverage 2>&1:*` Coverage >= 90%
 - `pana` — pub.dev quality gate
 
 Repo includes `.github/ISSUE_TEMPLATE/feature.yml` and `.github/pull_request_template.md`.
