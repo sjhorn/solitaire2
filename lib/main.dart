@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:solitaire/src/domain/game_state.dart';
+import 'package:solitaire/src/domain/playing_card.dart';
 import 'package:solitaire/src/widgets/board_widget.dart';
 
 void main() {
@@ -44,6 +45,25 @@ class _SolitaireHomeState extends State<SolitaireHome> {
     });
   }
 
+  void _dropOnFoundation(PlayingCard card, int foundationIndex) {
+    setState(() {
+      _gameState = _gameState.moveWasteToFoundation(foundationIndex) ?? _gameState;
+    });
+  }
+
+  void _dropOnTableau(PlayingCard card, int tableauIndex) {
+    setState(() {
+      // Try moving from waste to tableau
+      var newGameState = _gameState.moveWasteToTableau(tableauIndex);
+      if (newGameState != null) {
+        _gameState = newGameState;
+        return;
+      }
+      // Note: Tableau-to-tableau and foundation-to-tableau moves
+      // require tracking the source of the drag, which is not yet implemented
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,6 +74,8 @@ class _SolitaireHomeState extends State<SolitaireHome> {
       body: BoardWidget(
         gameState: _gameState,
         onStockTap: _drawFromStock,
+        onDropOnFoundation: _dropOnFoundation,
+        onDropOnTableau: _dropOnTableau,
       ),
     );
   }

@@ -1,3 +1,5 @@
+import 'package:solitaire/src/domain/card_rank.dart';
+import 'package:solitaire/src/domain/card_suit.dart';
 import 'package:solitaire/src/domain/deck.dart';
 import 'package:solitaire/src/domain/game_pile.dart';
 import 'package:solitaire/src/domain/pile_type.dart';
@@ -292,4 +294,151 @@ class GameState {
       tableauPiles: List.unmodifiable(_tableauPiles),
     );
   }
+
+  /// Tries to move a card from waste to a tableau pile.
+  GameState? moveWasteToTableau(int tableauIndex) {
+    if (_wastePile.isEmpty) return null;
+
+    final card = _wastePile.topCardThrow;
+    final tableau = _tableauPiles[tableauIndex];
+
+    if (_isValidTableauMove(card, tableau)) {
+      final newWaste = GamePile(type: PileType.waste);
+      newWaste.addCards(_wastePile.cards);
+      newWaste.removeTopCard();
+
+      final newTableau = GamePile(type: PileType.tableau);
+      newTableau.addCards(tableau.cards);
+      newTableau.addCard(card);
+
+      // Flip the new top card of the tableau if it was face-down
+      if (newTableau.cards.isNotEmpty && !newTableau.topCardThrow.faceUp) {
+        // This would require calling flipTableauCard logic here
+      }
+
+      return GameState._(
+        deck: _deck,
+        stockPile: _stockPile,
+        wastePile: newWaste,
+        foundationPiles: List.unmodifiable(_foundationPiles),
+        tableauPiles: List.generate(
+          7,
+          (i) => i == tableauIndex ? newTableau : _tableauPiles[i],
+        ),
+      );
+    }
+
+    return null;
+  }
+
+  /// Tries to move a card from foundation to a tableau pile.
+  GameState? moveFoundationToTableau(int foundationIndex, int tableauIndex) {
+    final foundation = _foundationPiles[foundationIndex];
+    if (foundation.isEmpty) return null;
+
+    final card = foundation.topCardThrow;
+    final tableau = _tableauPiles[tableauIndex];
+
+    if (_isValidTableauMove(card, tableau)) {
+      final newFoundation = GamePile(type: PileType.foundations);
+      newFoundation.addCards(foundation.cards);
+      newFoundation.removeTopCard();
+
+      final newTableau = GamePile(type: PileType.tableau);
+      newTableau.addCards(tableau.cards);
+      newTableau.addCard(card);
+
+      return GameState._(
+        deck: _deck,
+        stockPile: _stockPile,
+        wastePile: _wastePile,
+        foundationPiles: List.generate(
+          4,
+          (i) => i == foundationIndex ? newFoundation : _foundationPiles[i],
+        ),
+        tableauPiles: List.generate(
+          7,
+          (i) => i == tableauIndex ? newTableau : _tableauPiles[i],
+        ),
+      );
+    }
+
+    return null;
+  }
+
+  /// Tries to move cards from one tableau pile to another.
+  GameState? moveTableauToTableau(int fromIndex, int toIndex) {
+    if (fromIndex == toIndex) return null;
+
+    final fromTableau = _tableauPiles[fromIndex];
+    if (fromTableau.isEmpty) return null;
+
+    final card = fromTableau.topCardThrow;
+    final toTableau = _tableauPiles[toIndex];
+
+    if (_isValidTableauMove(card, toTableau)) {
+      // Get the stack of face-up cards to move
+      final stackToMove = _getFaceUpStack(fromTableau);
+
+      final newFromTableau = GamePile(type: PileType.tableau);
+      // Keep cards that aren't being moved
+      for (var i = 0; i < fromTableau.cards.length - stackToMove.length; i++) {
+        newFromTableau.addCard(fromTableau.cards[i]);
+      }
+
+      final newToTableau = GamePile(type: PileType.tableau);
+      newToTableau.addCards(toTableau.cards);
+      for (final moveCard in stackToMove) {
+        newToTableau.addCard(moveCard);
+      }
+
+      return GameState._(
+        deck: _deck,
+        stockPile: _stockPile,
+        wastePile: _wastePile,
+        foundationPiles: List.unmodifiable(_foundationPiles),
+        tableauPiles: List.generate(
+          7,
+          (i) => i == fromIndex
+              ? newFromTableau
+              : i == toIndex
+                  ? newToTableau
+                  : _tableauPiles[i],
+        ),
+      );
+    }
+
+    return null;
+  }
+
+  /// Returns all consecutive face-up cards from the top of a tableau pile.
+  List<PlayingCard> _getFaceUpStack(GamePile pile) {
+    final stack = <PlayingCard>[];
+    for (var i = pile.cards.length - 1; i >= 0; i--) {
+      if (pile.cards[i].faceUp) {
+        stack.insert(0, pile.cards[i]);
+      } else {
+        break;
+      }
+    }
+    return stack;
+  }
+
+  bool _isValidTableauMove(PlayingCard card, GamePile tableau) {
+    if (tableau.isEmpty) {
+      return card.rank == CardRank.king;
+    }
+
+    final topCard = tableau.topCardThrow;
+
+    // Must be opposite color and descending rank
+    final isOppositeColor = (card.suit.isRed && topCard.suit.isBlack) ||
+        (card.suit.isBlack && topCard.suit.isRed);
+    return isOppositeColor && card.rank.value == topCard.rank.value - 1;
+  }
+}
+
+extension on CardSuit {
+  bool get isRed => this == CardSuit.hearts || this == CardSuit.diamonds;
+  bool get isBlack => this == CardSuit.spades || this == CardSuit.clubs;
 }

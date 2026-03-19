@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:solitaire/src/domain/game_state.dart';
+import 'package:solitaire/src/domain/playing_card.dart';
 import 'package:solitaire/src/widgets/foundation_pile_widget.dart';
 import 'package:solitaire/src/widgets/stock_pile_widget.dart';
 import 'package:solitaire/src/widgets/tableau_pile_widget.dart';
@@ -17,10 +18,18 @@ class BoardWidget extends StatelessWidget {
   /// Callback when the stock pile is tapped.
   final VoidCallback onStockTap;
 
+  /// Callback when a card is dropped on a foundation.
+  final Function(PlayingCard card, int foundationIndex) onDropOnFoundation;
+
+  /// Callback when a card is dropped on a tableau.
+  final Function(PlayingCard card, int tableauIndex) onDropOnTableau;
+
   const BoardWidget({
     super.key,
     required this.gameState,
     required this.onStockTap,
+    required this.onDropOnFoundation,
+    required this.onDropOnTableau,
   });
 
   @override
@@ -61,7 +70,11 @@ class BoardWidget extends StatelessWidget {
           const SizedBox(width: 60),
           // Foundation piles (up to 4)
           for (int i = 0; i < 4 && i < foundationPiles.length; i++)
-            FoundationPileWidget(pile: foundationPiles[i]),
+            FoundationPileWidget(
+              pile: foundationPiles[i],
+              foundationIndex: i,
+              onDrop: onDropOnFoundation,
+            ),
         ],
       ),
     );
@@ -81,6 +94,8 @@ class BoardWidget extends StatelessWidget {
                 ? TableauPileWidget(
                     pile: tableauPiles[index],
                     xOffset: 0,
+                    tableauIndex: index,
+                    onDrop: onDropOnTableau,
                   )
                 : const SizedBox.shrink(),
           ),

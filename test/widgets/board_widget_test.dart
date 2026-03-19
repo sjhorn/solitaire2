@@ -91,6 +91,8 @@ void main() {
             child: BoardWidget(
               gameState: _createGameState(tableauPiles),
               onStockTap: () {},
+              onDropOnFoundation: (card, index) {},
+              onDropOnTableau: (card, index) {},
             ),
           ),
         ),
@@ -116,6 +118,8 @@ void main() {
             child: BoardWidget(
               gameState: _createGameState([], foundationPiles),
               onStockTap: () {},
+              onDropOnFoundation: (card, index) {},
+              onDropOnTableau: (card, index) {},
             ),
           ),
         ),
@@ -140,6 +144,8 @@ void main() {
             child: BoardWidget(
               gameState: _createGameState(tableauPiles, [], stockPile, wastePile),
               onStockTap: () {},
+              onDropOnFoundation: (card, index) {},
+              onDropOnTableau: (card, index) {},
             ),
           ),
         ),
@@ -326,7 +332,7 @@ void main() {
       await tester.pump();
 
       // Top card should be draggable - check for Draggable widget wrapping CardWidget
-      expect(find.byType(Draggable<PlayingCard>), findsOneWidget);
+      expect(find.byType(Draggable<List<PlayingCard>>), findsOneWidget);
     });
 
     testWidgets('renders face-down cards with Draggable for top card', (tester) async {
@@ -348,7 +354,7 @@ void main() {
       await tester.pump();
 
       // Only top card should be draggable
-      expect(find.byType(Draggable<PlayingCard>), findsOneWidget);
+      expect(find.byType(Draggable<List<PlayingCard>>), findsOneWidget);
     });
 
     testWidgets('positions cards with 30px overlap', (tester) async {
