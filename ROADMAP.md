@@ -173,7 +173,7 @@ A phased plan for building a fully-featured Klondike Solitaire game in Flutter w
 |---|---|---|---|
 | **M1 — Playable prototype** | 1–4 | Tappable game with no drag, correct rules | ✅ Complete |
 | **M2 — Interactive MVP** | 5 | Full drag & drop, playable end-to-end | ✅ Complete |
-| **M3 — Polished beta** | 6–8 | Animations, audio, scoring, settings | 🔄 In Progress (Phase 6 done) |
+| **M3 — Polished beta** | 6–8 | Animations, audio, scoring, settings | 🔄 In Progress (Phases 6-7 done) |
 | **M4 — Release candidate** | 9–10 | Tested, accessible, store-ready | ⏳ Pending |
 
 ---
