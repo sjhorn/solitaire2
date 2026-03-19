@@ -188,5 +188,41 @@ void main() {
       expect(options1, equals(options2));
       expect(options1, isNot(equals(options3)));
     });
+
+    test('copyWith updates all fields', () {
+      const options = GameStateOptions();
+      final newOptions = options.copyWith(
+        drawMode: DrawMode.drawThree,
+        scoringMode: ScoringMode.vegas,
+        timedMode: true,
+        soundEnabled: false,
+      );
+
+      expect(newOptions.drawMode, DrawMode.drawThree);
+      expect(newOptions.scoringMode, ScoringMode.vegas);
+      expect(newOptions.timedMode, true);
+      expect(newOptions.soundEnabled, false);
+    });
+
+    test('copyWith with no arguments returns equal instance', () {
+      const options = GameStateOptions(drawMode: DrawMode.drawThree, timedMode: true);
+      final copy = options.copyWith();
+
+      expect(copy, equals(options));
+    });
+
+    test('hashCode is consistent', () {
+      const options1 = GameStateOptions(drawMode: DrawMode.drawThree);
+      const options2 = GameStateOptions(drawMode: DrawMode.drawThree);
+
+      expect(options1.hashCode, equals(options2.hashCode));
+    });
+
+    test('hashCode differs for different options', () {
+      const options1 = GameStateOptions();
+      const options2 = GameStateOptions(timedMode: true);
+
+      expect(options1.hashCode, isNot(equals(options2.hashCode)));
+    });
   });
 }

@@ -1,6 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:solitaire/src/domain/deck.dart';
+import 'package:solitaire/src/domain/game_pile.dart';
+import 'package:solitaire/src/domain/game_score.dart';
 import 'package:solitaire/src/domain/game_service.dart';
+import 'package:solitaire/src/domain/game_state.dart';
 import 'package:solitaire/src/domain/game_state_options.dart';
+import 'package:solitaire/src/domain/pile_type.dart';
 
 void main() {
   group('GameService', () {
@@ -114,6 +119,81 @@ void main() {
       service.markWon();
 
       expect(service.score.endTime, isNotNull);
+    });
+
+    test('moveWasteToFoundation returns null when waste is empty', () {
+      final service = GameService.newGame();
+      final result = service.moveWasteToFoundation(0);
+
+      expect(result, isNull);
+    });
+
+    test('moveWasteToFoundation can be called', () {
+      final service = GameService.newGame();
+      // Just verify the method exists and can be called
+      // The actual move validation is tested in move_validation_test.dart
+      expect(service.moveWasteToFoundation, isA<Function>());
+    });
+
+    test('moveTableauToFoundation returns null for invalid move', () {
+      final service = GameService.newGame();
+      final result = service.moveTableauToFoundation(0, 0);
+
+      expect(result, isNull);
+    });
+
+    test('moveWasteToTableau returns null when waste is empty', () {
+      final service = GameService.newGame();
+      final result = service.moveWasteToTableau(0);
+
+      expect(result, isNull);
+    });
+
+    test('moveFoundationToTableau returns null when foundation is empty', () {
+      final service = GameService.newGame();
+      final result = service.moveFoundationToTableau(0, 0);
+
+      expect(result, isNull);
+    });
+
+    test('moveTableauToTableau returns null for same pile', () {
+      final service = GameService.newGame();
+      final result = service.moveTableauToTableau(0, 0);
+
+      expect(result, isNull);
+    });
+
+    test('flipTableauCard returns null when tableau is empty', () {
+      // Create a game with empty tableau pile
+      final deck = Deck();
+      deck.shuffle();
+      final stockPile = GamePile(type: PileType.stock);
+      final wastePile = GamePile(type: PileType.waste);
+      final foundationPiles = List.generate(4, (i) => GamePile(type: PileType.foundations));
+      final tableauPiles = List.generate(7, (i) => GamePile(type: PileType.tableau));
+
+      // Don't deal any cards - keep all tableau piles empty
+      // Put all cards in stock
+      while (deck.cards.isNotEmpty) {
+        stockPile.addCard(deck.draw());
+      }
+
+      final gameState = GameState.createWithPiles(
+        deck: deck,
+        stockPile: stockPile,
+        wastePile: wastePile,
+        foundationPiles: foundationPiles,
+        tableauPiles: tableauPiles,
+      );
+
+      final service = GameService(
+        gameState: gameState,
+        score: GameScore.start(),
+        options: const GameStateOptions(),
+      );
+
+      final result = service.flipTableauCard(0);
+      expect(result, isNull); // Empty tableau cannot flip
     });
   });
 }
