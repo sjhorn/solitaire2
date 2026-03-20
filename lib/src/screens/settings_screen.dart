@@ -141,7 +141,7 @@ class _SettingsSection extends StatelessWidget {
 
 class _DrawModeSection extends StatelessWidget {
   final DrawMode currentMode;
-  final Function(DrawMode?) onChanged;
+  final Function(DrawMode) onChanged;
 
   const _DrawModeSection({
     required this.currentMode,
@@ -150,20 +150,28 @@ class _DrawModeSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RadioListTile<DrawMode>(
-      title: const Text('Draw One'),
-      subtitle: const Text('Draw one card at a time'),
-      value: DrawMode.drawOne,
-      groupValue: currentMode,
-      onChanged: onChanged,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+    return Column(
+      children: [
+        _RadioOption(
+          title: const Text('Draw One'),
+          subtitle: const Text('Draw one card at a time'),
+          isSelected: currentMode == DrawMode.drawOne,
+          onTap: () => onChanged(DrawMode.drawOne),
+        ),
+        _RadioOption(
+          title: const Text('Draw Three'),
+          subtitle: const Text('Draw three cards at a time'),
+          isSelected: currentMode == DrawMode.drawThree,
+          onTap: () => onChanged(DrawMode.drawThree),
+        ),
+      ],
     );
   }
 }
 
 class _ScoringModeSection extends StatelessWidget {
   final ScoringMode currentMode;
-  final Function(ScoringMode?) onChanged;
+  final Function(ScoringMode) onChanged;
 
   const _ScoringModeSection({
     required this.currentMode,
@@ -174,21 +182,17 @@ class _ScoringModeSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        RadioListTile<ScoringMode>(
+        _RadioOption(
           title: const Text('Classic'),
           subtitle: const Text('No scoring, just play'),
-          value: ScoringMode.classic,
-          groupValue: currentMode,
-          onChanged: onChanged,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+          isSelected: currentMode == ScoringMode.classic,
+          onTap: () => onChanged(ScoringMode.classic),
         ),
-        RadioListTile<ScoringMode>(
+        _RadioOption(
           title: const Text('Vegas'),
           subtitle: const Text('Points for moves, penalties for time'),
-          value: ScoringMode.vegas,
-          groupValue: currentMode,
-          onChanged: onChanged,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+          isSelected: currentMode == ScoringMode.vegas,
+          onTap: () => onChanged(ScoringMode.vegas),
         ),
       ],
     );
@@ -218,7 +222,7 @@ class _TimedModeSection extends StatelessWidget {
 
 class _CardBackSection extends StatelessWidget {
   final CardBackDesign currentDesign;
-  final Function(CardBackDesign?) onChanged;
+  final Function(CardBackDesign) onChanged;
 
   const _CardBackSection({
     required this.currentDesign,
@@ -229,35 +233,71 @@ class _CardBackSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        RadioListTile<CardBackDesign>(
+        _RadioOption(
           title: const Text('Classic Blue'),
-          value: CardBackDesign.classic,
-          groupValue: currentDesign,
-          onChanged: onChanged,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+          isSelected: currentDesign == CardBackDesign.classic,
+          onTap: () => onChanged(CardBackDesign.classic),
         ),
-        RadioListTile<CardBackDesign>(
+        _RadioOption(
           title: const Text('Blue'),
-          value: CardBackDesign.blue,
-          groupValue: currentDesign,
-          onChanged: onChanged,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+          isSelected: currentDesign == CardBackDesign.blue,
+          onTap: () => onChanged(CardBackDesign.blue),
         ),
-        RadioListTile<CardBackDesign>(
+        _RadioOption(
           title: const Text('Red'),
-          value: CardBackDesign.red,
-          groupValue: currentDesign,
-          onChanged: onChanged,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+          isSelected: currentDesign == CardBackDesign.red,
+          onTap: () => onChanged(CardBackDesign.red),
         ),
-        RadioListTile<CardBackDesign>(
+        _RadioOption(
           title: const Text('Green'),
-          value: CardBackDesign.green,
-          groupValue: currentDesign,
-          onChanged: onChanged,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+          isSelected: currentDesign == CardBackDesign.green,
+          onTap: () => onChanged(CardBackDesign.green),
         ),
       ],
+    );
+  }
+}
+
+class _RadioOption extends StatelessWidget {
+  final Widget title;
+  final Widget? subtitle;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _RadioOption({
+    required this.title,
+    this.subtitle,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  title,
+                  if (subtitle != null) ...[
+                    const SizedBox(height: 4),
+                    subtitle!,
+                  ],
+                ],
+              ),
+            ),
+            Icon(
+              isSelected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+              color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
