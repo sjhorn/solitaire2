@@ -24,14 +24,16 @@ Key github tools used in workflow:
 ---
 
 ## Rules
+- Always ensure you have pulled the latest from remote git into the branch when beginning work
 - Always use the exact tool name and parameter format. Never improvise tool schemas.
 - When editing files, provide complete replacement content — never use placeholder comments like // rest of code here.
 - If a tool call fails, retry with corrected syntax before trying a different approach.
 - Complete one tool call at a time. Do not batch multiple operations into a single response.
-- Never use `git`, `gh`, `dart`, or `flutter` CLI — use MCP equivalents
+- Never push directly to main or master branch — must create a branch and pull request
+- Never push before running the test suite and confirming all tests, coverage and analysis pass as for the github action
+- Never use `git`, `gh`, `dart`, or `flutter` CLI commands directly — use MCP equivalents
 - Never use shell operators: `>` `>>` `2>&1` `&&` `||` `$()` `|` — one simple command per Bash call
 - Use Claude native tools (Read, Edit, Write, Glob, Grep) for file operations
-- Never push to `main` directly
 - Atomic commits — one logical change per commit
 - Never mark a checkbox until the step is verified
 - On errors, surface and ask the user before retrying
@@ -68,6 +70,7 @@ Run via `mcp__dart__*`, confirm failure. Check off RED tasks.
 ### 4. GREEN — Make It Pass
 Write **minimal** implementation. Run full suite via `mcp__dart__*` with timeout to avoid getting stuck.
 All green, no regressions. Check off GREEN tasks.
+Ensure our test coverage is above 90% via `flutter test --coverage 2>&1:*`
 
 ### 5. Commit & PR
 `mcp__server-git__git_add` + `git_commit`: `feat: <description> (closes #<N>)`
@@ -96,7 +99,7 @@ Entities: immutable, `final` fields, factory constructors.
 PR merge requires all checks green (`.github/workflows/ci.yml`):
 - `dart analyze` — zero issues
 - `flutter test` — all pass
-- Coverage >= 90%
+- `flutter test --coverage 2>&1:*` Coverage >= 90%
 - `pana` — pub.dev quality gate
 
 Repo includes `.github/ISSUE_TEMPLATE/feature.yml` and `.github/pull_request_template.md`.

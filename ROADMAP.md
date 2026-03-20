@@ -2,19 +2,21 @@
 
 A phased plan for building a fully-featured Klondike Solitaire game in Flutter with drag-and-drop, rich card visuals, and polished UX.
 
+**Current Status:** Phases 1-5 Complete — Working on Phase 7 (Scoring & Game Options) | Coverage: 90%+
+
 ---
 
-## Phase 1 — Project Scaffold & Architecture
+## Phase 1 — Project Scaffold & Architecture ✅ COMPLETE
 
 **Goal:** Establish a clean, scalable foundation before writing any game logic.
 
 - [x] Define the folder structure:
   ```
   lib/
-  ├── models/        # Card, Deck, Pile, GameState
-  ├── providers/     # State / logic layer
+  ├── domain/        # Card, Deck, Pile, GameState
+  ├── application/   # Use cases
+  ├── infrastructure/ # Repo implementations
   ├── widgets/       # CardWidget, PileWidget, BoardWidget
-  ├── utils/         # Constants, helpers
   └── main.dart
   ```
 - [ ] Add dependencies to `pubspec.yaml`:
@@ -25,7 +27,7 @@ A phased plan for building a fully-featured Klondike Solitaire game in Flutter w
 
 ---
 
-## Phase 2 — Game Logic & Data Models
+## Phase 2 — Game Logic & Data Models ✅ COMPLETE
 
 **Goal:** Implement the complete rules of Klondike Solitaire in pure Dart, fully testable with no UI dependency.
 
@@ -49,9 +51,9 @@ A phased plan for building a fully-featured Klondike Solitaire game in Flutter w
 
 ---
 
-## Phase 3 — Card Visuals
+## Phase 3 — Card Visuals ✅ COMPLETE
 
-**Goal:** Design beautiful, recognizable playing cards rendered entirely in Flutter (no image assets required).
+**Goal:** Design beautiful, recognizable playing cards rendered entirely in Flutter.
 
 - [x] **`CardWidget`** — a `StatelessWidget` accepting a `PlayingCard`
   - Rounded rectangle with white background and subtle shadow
@@ -59,60 +61,60 @@ A phased plan for building a fully-featured Klondike Solitaire game in Flutter w
   - Large centered suit symbol for face cards or pip layout for number cards
 - [x] **Suit symbols** — render using Unicode characters (♠ ♥ ♦ ♣) with correct colors (red / black)
 - [x] **Pip layout** — accurate pip arrangements for 2–10 (e.g. 3-of-hearts has 3 hearts in the right positions)
-- [x] **Face cards (J, Q, K)** — stylized letter + suit symbol in contrasting color block; or optionally use SVG assets
-- [x] **Card back design** — decorative repeating pattern (e.g. diagonal hatching or club/diamond tile) using `CustomPainter`
+- [x] **Face cards (J, Q, K)** — stylized letter + suit symbol in contrasting color block
+- [x] **Card back design** — decorative repeating pattern using `CustomPainter`
 - [x] **Face-down card** — show back design; face-up card shows rank/suit
 - [x] **Empty pile placeholder** — outlined rounded rectangle with faint suit icon
-- [x] **Selected / dragging state** — slight scale-up + elevation shadow to indicate a card is lifted
+- [x] **Selected / dragging state** — face-down placeholder shown during drag
 - [ ] **Responsive card sizing** — cards scale to screen width so the game fits phones and tablets
 
 ---
 
-## Phase 4 — Board Layout
+## Phase 4 — Board Layout ✅ COMPLETE
 
 **Goal:** Lay out all piles correctly and responsively on screen.
 
-- [x] **`BoardWidget`** — top-level layout using `Stack` or `Column` + `Row`
+- [x] **`BoardWidget`** — top-level layout using `Stack`
 - [x] **Top row:** Stock | Waste | (gap) | Foundation × 4
 - [x] **Tableau row:** 7 overlapping `TableauPileWidget` columns
-- [x] **`TableauPileWidget`** — vertically stacked cards with a fixed overlap offset (e.g. 30 px per card, more if face-up)
+- [x] **`TableauPileWidget`** — vertically stacked cards with overlap offset
 - [x] **`FoundationPileWidget`** — single card shown (or placeholder)
-- [x] **`StockPileWidget`** — tappable stack; fan-offset for 3-card draw mode
-- [x] **`WastePileWidget`** — shows top 1 or 3 cards fanned
+- [x] **`StockPileWidget`** — tappable stack
+- [x] **`WastePileWidget`** — shows top card with drag support
 - [ ] Ensure layout uses `LayoutBuilder` for different screen sizes
 - [ ] Landscape and portrait orientations handled gracefully
 
 ---
 
-## Phase 5 — Drag & Drop Interaction
+## Phase 5 — Drag & Drop Interaction ✅ COMPLETE
 
 **Goal:** Implement smooth, intuitive card dragging with valid drop-target highlighting.
 
 - [x] Wrap draggable cards with Flutter's `Draggable<List<PlayingCard>>`
   - Drag data is a list (single card or a stack of cards)
   - `feedback` widget: lifted card(s) with shadow, slightly larger than normal
-  - `childWhenDragging`: faded/ghost placeholder in original position
+  - `childWhenDragging`: face-down placeholder in original position
 - [x] Wrap target piles with `DragTarget<List<PlayingCard>>`
   - `onWillAccept`: call move validator — returns `true`/`false`
   - `onAccept`: dispatch move to game state provider
 - [x] **Visual drop-target feedback:**
   - Valid target: green highlight border on pile
-  - Invalid target: red tint or no highlight (reject silently)
-- [x] **Multi-card drag** — dragging a face-up stack from a tableau pile drags all cards below it together; render as a fanned vertical stack in the feedback widget
+  - Invalid target: no highlight (reject silently)
+- [x] **Multi-card drag** — dragging a face-up stack from a tableau pile drags all cards below it together
 - [x] **Tap-to-move shortcut:**
   - Tap a waste card → auto-move to valid tableau or foundation if possible
   - Tap a tableau card → auto-move to foundation if valid
   - Tap stock → draw card(s)
-- [x] **Tap stock** — flip 1 or 3 cards from stock to waste
-- [ ] Snap-back animation when a drop is rejected (card flies back to origin)
-- [ ] Drag threshold (minimum drag distance before drag starts, to prevent accidental drags)
 - [x] Tableau-to-tableau moves working
 - [x] Foundation-to-tableau moves working
 - [x] Waste drag support
+- [ ] Snap-back animation when a drop is rejected (card flies back to origin)
+- [ ] Drag threshold (minimum drag distance before drag starts, to prevent accidental drags)
+- [ ] Stock pile drag support
 
 ---
 
-## Phase 6 — Animations & Polish
+## Phase 6 — Animations & Polish — TODO
 
 **Goal:** Add animations that make the game feel alive and satisfying.
 
@@ -127,7 +129,7 @@ A phased plan for building a fully-featured Klondike Solitaire game in Flutter w
 
 ---
 
-## Phase 7 — Scoring & Game Options
+## Phase 7 — Scoring & Game Options — TODO
 
 **Goal:** Add replayability and customisation.
 
@@ -151,7 +153,7 @@ A phased plan for building a fully-featured Klondike Solitaire game in Flutter w
 
 ---
 
-## Phase 8 — Audio & Haptics
+## Phase 8 — Audio & Haptics — TODO
 
 **Goal:** Reinforce interactions with subtle sensory feedback.
 
@@ -167,7 +169,7 @@ A phased plan for building a fully-featured Klondike Solitaire game in Flutter w
 
 ---
 
-## Phase 9 — Accessibility & QA
+## Phase 9 — Accessibility & QA — TODO
 
 **Goal:** Make the game playable for everyone and ensure it is bug-free.
 
@@ -184,7 +186,7 @@ A phased plan for building a fully-featured Klondike Solitaire game in Flutter w
 
 ---
 
-## Phase 10 — Release Preparation
+## Phase 10 — Release Preparation — TODO
 
 **Goal:** Ship a polished, store-ready app.
 
@@ -202,12 +204,12 @@ A phased plan for building a fully-featured Klondike Solitaire game in Flutter w
 
 ## Milestone Summary
 
-| Milestone | Phases | Deliverable |
-|---|---|---|
-| **M1 — Playable prototype** | 1–4 | Tappable game with no drag, correct rules |
-| **M2 — Interactive MVP** | 5 | Full drag & drop, playable end-to-end |
-| **M3 — Polished beta** | 6–8 | Animations, audio, scoring, settings |
-| **M4 — Release candidate** | 9–10 | Tested, accessible, store-ready |
+| Milestone | Phases | Deliverable | Status |
+|---|---|---|---|
+| **M1 — Playable prototype** | 1–4 | Tappable game with no drag, correct rules | ✅ Complete |
+| **M2 — Interactive MVP** | 5 | Full drag & drop, playable end-to-end | ✅ Complete |
+| **M3 — Polished beta** | 6–8 | Animations, audio, scoring, settings | ⏳ Pending |
+| **M4 — Release candidate** | 9–10 | Tested, accessible, store-ready | ⏳ Pending |
 
 ---
 
