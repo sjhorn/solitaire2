@@ -16,11 +16,15 @@ class FoundationPileWidget extends StatelessWidget {
   /// The index of this foundation pile (0-3).
   final int foundationIndex;
 
+  /// Whether this pile is highlighted as part of a hint.
+  final bool isHinted;
+
   const FoundationPileWidget({
     super.key,
     required this.pile,
     this.onDrop,
     this.foundationIndex = 0,
+    this.isHinted = false,
   });
 
   @override
@@ -40,17 +44,20 @@ class FoundationPileWidget extends StatelessWidget {
       },
       builder: (context, candidateData, rejectedData) {
         final isDragOver = candidateData.isNotEmpty;
+        final borderColor = isHinted ? Colors.green : (isDragOver ? Colors.green : Colors.grey);
+        final borderWidth = isHinted ? 3.0 : (isDragOver ? 3.0 : 2.0);
+        final bgColor = isHinted ? Colors.green.withValues(alpha: 0.2) : (isDragOver ? Colors.green.withValues(alpha: 0.2) : null);
         return Container(
           width: 80,
           height: 120,
           margin: const EdgeInsets.all(4),
           decoration: BoxDecoration(
             border: Border.all(
-              color: isDragOver ? Colors.green : Colors.grey,
-              width: isDragOver ? 3 : 2,
+              color: borderColor,
+              width: borderWidth,
             ),
             borderRadius: BorderRadius.circular(8),
-            color: isDragOver ? Colors.green.withValues(alpha: 0.2) : null,
+            color: bgColor,
           ),
           child: Center(
             child: pile.isEmpty
@@ -58,7 +65,7 @@ class FoundationPileWidget extends StatelessWidget {
                     'A',
                     style: TextStyle(
                       fontSize: 48,
-                      color: Colors.grey,
+                      color: isHinted ? Colors.green : Colors.grey,
                       fontWeight: FontWeight.bold,
                     ),
                   )

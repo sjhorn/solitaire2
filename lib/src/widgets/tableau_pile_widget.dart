@@ -22,6 +22,9 @@ class TableauPileWidget extends StatelessWidget {
   /// The index of this tableau pile (0-6).
   final int tableauIndex;
 
+  /// Whether this pile is highlighted as part of a hint.
+  final bool isHinted;
+
   const TableauPileWidget({
     super.key,
     required this.pile,
@@ -29,6 +32,7 @@ class TableauPileWidget extends StatelessWidget {
     this.onDrop,
     this.onAutoMove,
     this.tableauIndex = 0,
+    this.isHinted = false,
   });
 
   @override
@@ -85,10 +89,12 @@ class TableauPileWidget extends StatelessWidget {
       final stack = _getFaceUpStack();
 
       // Build the card widget with optional drag
+      final isHighlighted = isHinted || isDragOver;
       final cardWidget = Container(
         decoration: BoxDecoration(
-          border: isDragOver ? Border.all(color: Colors.green, width: 2) : null,
+          border: isHighlighted ? Border.all(color: Colors.green, width: 2) : null,
           borderRadius: BorderRadius.circular(8),
+          color: isHighlighted ? Colors.green.withValues(alpha: 0.2) : null,
         ),
         child: CardWidget(card: card),
       );
@@ -116,6 +122,7 @@ class TableauPileWidget extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
+          color: isHinted ? Colors.green.withValues(alpha: 0.2) : null,
         ),
         child: CardWidget(card: card),
       ),

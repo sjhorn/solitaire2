@@ -1,7 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:solitaire/src/domain/game_state.dart';
+import 'package:solitaire/src/domain/game_service.dart';
 import 'package:solitaire/src/domain/playing_card.dart';
+import 'package:solitaire/src/hint_service.dart';
+import 'package:solitaire/src/screens/settings_screen.dart';
 import 'package:solitaire/src/widgets/board_widget.dart';
+import 'package:solitaire/src/widgets/control_buttons_widget.dart';
+import 'package:solitaire/src/widgets/score_display_widget.dart';
 
 void main() {
   runApp(const SolitaireApp());
@@ -31,68 +37,140 @@ class SolitaireHome extends StatefulWidget {
 }
 
 class _SolitaireHomeState extends State<SolitaireHome> {
-  late GameState _gameState;
+  late GameService _gameService;
+  Timer? _timer;
+  Hint? _currentHint;
 
   @override
   void initState() {
     super.initState();
-    _gameState = GameState.initial();
+    _startNewGame();
+    _startTimer();
   }
 
-  void _drawFromStock() {
-    setState(() {
-      _gameState = _gameState.drawFromStock();
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _startTimer() {
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {});
     });
+  }
+
+  void _startNewGame() {
+    _gameService = GameService.newGame();
+    _currentHint = null;
+    _startTimer();
+  }
+
+  void _drawCard() {
+    _gameService.drawCard();
+    setState(() {});
   }
 
   void _dropOnFoundation(PlayingCard card, int foundationIndex) {
-    setState(() {
-      // Try moving from waste to foundation
-      var newGameState = _gameState.moveWasteToFoundation(foundationIndex);
-      if (newGameState != null) {
-        _gameState = newGameState;
+    // Try moving from waste to foundation
+    var result = _gameService.moveWasteToFoundation(foundationIndex);
+    if (result != null) {
+      _gameService = result;
+      _checkWin();
+      setState(() {});
+      return;
+    }
+
+    // Try moving from tableau to foundation
+    for (var tableauIndex = 0; tableauIndex < 7; tableauIndex++) {
+      result = _gameService.moveTableauToFoundation(tableauIndex, foundationIndex);
+      if (result != null) {
+        _gameService = result;
+        _checkWin();
+        setState(() {});
         return;
       }
-
-      // Try moving from tableau to foundation
-      for (var tableauIndex = 0; tableauIndex < 7; tableauIndex++) {
-        newGameState = _gameState.moveTableauToFoundation(tableauIndex, foundationIndex);
-        if (newGameState != null) {
-          _gameState = newGameState;
-          return;
-        }
-      }
-    });
+    }
   }
 
   void _dropOnTableau(PlayingCard card, int tableauIndex) {
-    setState(() {
-      // Try moving from waste to tableau
-      var newGameState = _gameState.moveWasteToTableau(tableauIndex);
-      if (newGameState != null) {
-        _gameState = newGameState;
+    // Try moving from waste to tableau
+    var result = _gameService.moveWasteToTableau(tableauIndex);
+    if (result != null) {
+      _gameService = result;
+      _checkWin();
+      setState(() {});
+      return;
+    }
+
+    // Try moving from foundation to tableau
+    for (var foundationIndex = 0; foundationIndex < 4; foundationIndex++) {
+      result = _gameService.moveFoundationToTableau(foundationIndex, tableauIndex);
+      if (result != null) {
+        _gameService = result;
+        _checkWin();
+        setState(() {});
         return;
       }
+    }
 
-      // Try moving from foundation to tableau
-      for (var foundationIndex = 0; foundationIndex < 4; foundationIndex++) {
-        newGameState = _gameState.moveFoundationToTableau(foundationIndex, tableauIndex);
-        if (newGameState != null) {
-          _gameState = newGameState;
-          return;
-        }
+    // Try moving from one tableau to another
+    for (var fromTableauIndex = 0; fromTableauIndex < 7; fromTableauIndex++) {
+      if (fromTableauIndex == tableauIndex) continue;
+      result = _gameService.moveTableauToTableau(fromTableauIndex, tableauIndex);
+      if (result != null) {
+        _gameService = result;
+        _checkWin();
+        setState(() {});
+        return;
       }
+    }
+  }
 
-      // Try moving from one tableau to another
-      for (var fromTableauIndex = 0; fromTableauIndex < 7; fromTableauIndex++) {
-        if (fromTableauIndex == tableauIndex) continue;
-        newGameState = _gameState.moveTableauToTableau(fromTableauIndex, tableauIndex);
-        if (newGameState != null) {
-          _gameState = newGameState;
-          return;
-        }
-      }
-    });
+  void _checkWin() {
+    if (_gameService.isWon) {
+      _gameService.markWon();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Congratulations! You won!')),
+      );
+    }
+  }
+
+  void _undo() {
+    if (_gameService.undoStackSize > 0) {
+      _gameService.undo();
+      setState(() {});
+    }
+  }
+
+  void _showHint() {
+    final gameState = _gameService.gameState;
+    final hints = HintService().findHints(gameState);
+    if (hints.isNotEmpty) {
+      _currentHint = hints.first;
+      setState(() {});
+      // Clear hint after 2 seconds
+      Future.delayed(const Duration(seconds: 2), () {
+        setState(() {
+          _currentHint = null;
+        });
+      });
+    }
+  }
+
+  void _openSettings() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SettingsScreen(
+          options: _gameService.options,
+          onOptionsChanged: (newOptions) {
+            _gameService.updateOptions(newOptions);
+          },
+        ),
+      ),
+    );
   }
 
   @override
@@ -101,12 +179,44 @@ class _SolitaireHomeState extends State<SolitaireHome> {
       appBar: AppBar(
         title: const Text('Solitaire'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: _openSettings,
+          ),
+        ],
       ),
-      body: BoardWidget(
-        gameState: _gameState,
-        onStockTap: _drawFromStock,
-        onDropOnFoundation: _dropOnFoundation,
-        onDropOnTableau: _dropOnTableau,
+      body: Column(
+        children: [
+          // Score display
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ScoreDisplayWidget(
+              score: _gameService.score,
+              showTimer: _gameService.options.timedMode,
+            ),
+          ),
+          // Control buttons
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: ControlButtonsWidget(
+              onNewGame: _startNewGame,
+              onUndo: _undo,
+              onHint: _showHint,
+              undoEnabled: _gameService.undoStackSize > 0,
+            ),
+          ),
+          // Game board
+          Expanded(
+            child: BoardWidget(
+              gameState: _gameService.gameState,
+              onStockTap: _drawCard,
+              onDropOnFoundation: _dropOnFoundation,
+              onDropOnTableau: _dropOnTableau,
+              hint: _currentHint,
+            ),
+          ),
+        ],
       ),
     );
   }
