@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:solitaire/src/domain/game_state.dart';
 import 'package:solitaire/src/domain/playing_card.dart';
+import 'package:solitaire/src/hint_service.dart';
 import 'package:solitaire/src/widgets/foundation_pile_widget.dart';
 import 'package:solitaire/src/widgets/stock_pile_widget.dart';
 import 'package:solitaire/src/widgets/tableau_pile_widget.dart';
@@ -24,13 +25,33 @@ class BoardWidget extends StatelessWidget {
   /// Callback when a card is dropped on a tableau.
   final Function(PlayingCard card, int tableauIndex) onDropOnTableau;
 
+  /// The current hint to highlight, if any.
+  final Hint? hint;
+
   const BoardWidget({
     super.key,
     required this.gameState,
     required this.onStockTap,
     required this.onDropOnFoundation,
     required this.onDropOnTableau,
+    this.hint,
   });
+
+  bool _isHinted(int tableauIndex) {
+    if (hint == null) return false;
+    return hint!.tableauIndex == tableauIndex || hint!.targetTableauIndex == tableauIndex;
+  }
+
+  bool _isHintedFoundation(int foundationIndex) {
+    if (hint == null) return false;
+    return hint!.foundationsIndex == foundationIndex;
+  }
+
+  bool _isHintedWaste() {
+    if (hint == null) return false;
+    return hint!.type == HintType.wasteToFoundation ||
+           hint!.type == HintType.wasteToTableau;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +86,7 @@ class BoardWidget extends StatelessWidget {
           // Stock pile
           StockPileWidget(pile: gameState.stockPile, onTap: onStockTap),
           // Waste pile
-          WastePileWidget(pile: gameState.wastePile),
+          WastePileWidget(pile: gameState.wastePile, isHinted: _isHintedWaste()),
           // Gap
           const SizedBox(width: 60),
           // Foundation piles (up to 4)
@@ -74,6 +95,7 @@ class BoardWidget extends StatelessWidget {
               pile: foundationPiles[i],
               foundationIndex: i,
               onDrop: onDropOnFoundation,
+              isHinted: _isHintedFoundation(i),
             ),
         ],
       ),
@@ -96,6 +118,7 @@ class BoardWidget extends StatelessWidget {
                     xOffset: 0,
                     tableauIndex: index,
                     onDrop: onDropOnTableau,
+                    isHinted: _isHinted(index),
                   )
                 : const SizedBox.shrink(),
           ),

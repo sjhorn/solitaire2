@@ -16,11 +16,15 @@ class WastePileWidget extends StatelessWidget {
   /// Callback when a card is dropped on a target.
   final Function(PlayingCard card)? onDrop;
 
+  /// Whether this pile is highlighted as part of a hint.
+  final bool isHinted;
+
   const WastePileWidget({
     super.key,
     required this.pile,
     this.onTap,
     this.onDrop,
+    this.isHinted = false,
   });
 
   @override
@@ -33,8 +37,9 @@ class WastePileWidget extends StatelessWidget {
           height: 120,
           margin: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey, width: 2),
+            border: Border.all(color: isHinted ? Colors.green : Colors.grey, width: isHinted ? 3 : 2),
             borderRadius: BorderRadius.circular(8),
+            color: isHinted ? Colors.green.withValues(alpha: 0.2) : null,
           ),
           child: const SizedBox.shrink(),
         ),
@@ -53,8 +58,9 @@ class WastePileWidget extends StatelessWidget {
             height: 120,
             margin: const EdgeInsets.all(4),
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey, width: 2),
+              border: Border.all(color: isHinted ? Colors.green : Colors.grey, width: isHinted ? 3 : 2),
               borderRadius: BorderRadius.circular(8),
+              color: isHinted ? Colors.green.withValues(alpha: 0.2) : null,
             ),
             child: Draggable<List<PlayingCard>>(
               data: [topCard],
