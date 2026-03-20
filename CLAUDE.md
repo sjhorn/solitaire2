@@ -24,7 +24,10 @@ Key github tools used in workflow:
 ---
 
 ## Rules
-
+- Always use the exact tool name and parameter format. Never improvise tool schemas.
+- When editing files, provide complete replacement content — never use placeholder comments like // rest of code here.
+- If a tool call fails, retry with corrected syntax before trying a different approach.
+- Complete one tool call at a time. Do not batch multiple operations into a single response.
 - Never use `git`, `gh`, `dart`, or `flutter` CLI — use MCP equivalents
 - Never use shell operators: `>` `>>` `2>&1` `&&` `||` `$()` `|` — one simple command per Bash call
 - Use Claude native tools (Read, Edit, Write, Glob, Grep) for file operations
@@ -63,7 +66,7 @@ Write **minimal** failing test. Mirror paths: `lib/src/domain/foo.dart` → `tes
 Run via `mcp__dart__*`, confirm failure. Check off RED tasks.
 
 ### 4. GREEN — Make It Pass
-Write **minimal** implementation. Run full suite via `mcp__dart__*`.
+Write **minimal** implementation. Run full suite via `mcp__dart__*` with timeout to avoid getting stuck.
 All green, no regressions. Check off GREEN tasks.
 
 ### 5. Commit & PR

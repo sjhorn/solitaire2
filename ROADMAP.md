@@ -8,7 +8,7 @@ A phased plan for building a fully-featured Klondike Solitaire game in Flutter w
 
 **Goal:** Establish a clean, scalable foundation before writing any game logic.
 
-- [ ] Define the folder structure:
+- [x] Define the folder structure:
   ```
   lib/
   ├── models/        # Card, Deck, Pile, GameState
@@ -20,8 +20,8 @@ A phased plan for building a fully-featured Klondike Solitaire game in Flutter w
 - [ ] Add dependencies to `pubspec.yaml`:
   - `collection` (for list utilities)
   - `audioplayers` (for sound effects, later)
-- [ ] Set up `CardSuit` and `CardRank` enums
-- [ ] Create the core `PlayingCard` model (suit, rank, isFaceUp, isSelected)
+- [x] Set up `CardSuit` and `CardRank` enums
+- [x] Create the core `PlayingCard` model (suit, rank, isFaceUp, isSelected)
 
 ---
 
@@ -29,23 +29,23 @@ A phased plan for building a fully-featured Klondike Solitaire game in Flutter w
 
 **Goal:** Implement the complete rules of Klondike Solitaire in pure Dart, fully testable with no UI dependency.
 
-- [ ] **Deck model** — 52-card deck, shuffle logic
-- [ ] **Pile types:**
+- [x] **Deck model** — 52-card deck, shuffle logic
+- [x] **Pile types:**
   - `StockPile` — the draw pile (top-left)
   - `WastePile` — drawn cards (next to stock)
   - `FoundationPile` × 4 — Ace → King per suit (top-right)
   - `TableauPile` × 7 — alternating color, descending rank
-- [ ] **Deal logic** — distribute cards correctly at game start (1–7 cards per tableau, top card face-up)
-- [ ] **Move validation rules:**
+- [x] **Deal logic** — distribute cards correctly at game start (1–7 cards per tableau, top card face-up)
+- [x] **Move validation rules:**
   - Tableau: alternating color, rank n–1
   - Foundation: same suit, ascending from Ace
   - Stock → Waste: flip 1 or 3 cards (configurable)
   - Waste → Stock: recycle when stock is empty
-- [ ] **Move execution** — immutable state updates (move returns new `GameState`)
-- [ ] **Win detection** — all 52 cards on foundations
+- [x] **Move execution** — immutable state updates (move returns new `GameState`)
+- [x] **Win detection** — all 52 cards on foundations
 - [ ] **Undo stack** — save snapshots of `GameState` for undo support
 - [ ] **Auto-complete** — detect when all cards are face-up and move to foundations automatically
-- [ ] Unit tests for all move rules and edge cases
+- [x] Unit tests for all move rules and edge cases (192 tests passing)
 
 ---
 
@@ -53,17 +53,17 @@ A phased plan for building a fully-featured Klondike Solitaire game in Flutter w
 
 **Goal:** Design beautiful, recognizable playing cards rendered entirely in Flutter (no image assets required).
 
-- [ ] **`CardWidget`** — a `StatelessWidget` accepting a `PlayingCard`
+- [x] **`CardWidget`** — a `StatelessWidget` accepting a `PlayingCard`
   - Rounded rectangle with white background and subtle shadow
   - Top-left and bottom-right rank + suit labels
   - Large centered suit symbol for face cards or pip layout for number cards
-- [ ] **Suit symbols** — render using Unicode characters (♠ ♥ ♦ ♣) with correct colors (red / black)
-- [ ] **Pip layout** — accurate pip arrangements for 2–10 (e.g. 3-of-hearts has 3 hearts in the right positions)
-- [ ] **Face cards (J, Q, K)** — stylized letter + suit symbol in contrasting color block; or optionally use SVG assets
-- [ ] **Card back design** — decorative repeating pattern (e.g. diagonal hatching or club/diamond tile) using `CustomPainter`
-- [ ] **Face-down card** — show back design; face-up card shows rank/suit
-- [ ] **Empty pile placeholder** — outlined rounded rectangle with faint suit icon
-- [ ] **Selected / dragging state** — slight scale-up + elevation shadow to indicate a card is lifted
+- [x] **Suit symbols** — render using Unicode characters (♠ ♥ ♦ ♣) with correct colors (red / black)
+- [x] **Pip layout** — accurate pip arrangements for 2–10 (e.g. 3-of-hearts has 3 hearts in the right positions)
+- [x] **Face cards (J, Q, K)** — stylized letter + suit symbol in contrasting color block; or optionally use SVG assets
+- [x] **Card back design** — decorative repeating pattern (e.g. diagonal hatching or club/diamond tile) using `CustomPainter`
+- [x] **Face-down card** — show back design; face-up card shows rank/suit
+- [x] **Empty pile placeholder** — outlined rounded rectangle with faint suit icon
+- [x] **Selected / dragging state** — slight scale-up + elevation shadow to indicate a card is lifted
 - [ ] **Responsive card sizing** — cards scale to screen width so the game fits phones and tablets
 
 ---
@@ -72,13 +72,13 @@ A phased plan for building a fully-featured Klondike Solitaire game in Flutter w
 
 **Goal:** Lay out all piles correctly and responsively on screen.
 
-- [ ] **`BoardWidget`** — top-level layout using `Stack` or `Column` + `Row`
-- [ ] **Top row:** Stock | Waste | (gap) | Foundation × 4
-- [ ] **Tableau row:** 7 overlapping `TableauPileWidget` columns
-- [ ] **`TableauPileWidget`** — vertically stacked cards with a fixed overlap offset (e.g. 30 px per card, more if face-up)
-- [ ] **`FoundationPileWidget`** — single card shown (or placeholder)
-- [ ] **`StockPileWidget`** — tappable stack; fan-offset for 3-card draw mode
-- [ ] **`WastePileWidget`** — shows top 1 or 3 cards fanned
+- [x] **`BoardWidget`** — top-level layout using `Stack` or `Column` + `Row`
+- [x] **Top row:** Stock | Waste | (gap) | Foundation × 4
+- [x] **Tableau row:** 7 overlapping `TableauPileWidget` columns
+- [x] **`TableauPileWidget`** — vertically stacked cards with a fixed overlap offset (e.g. 30 px per card, more if face-up)
+- [x] **`FoundationPileWidget`** — single card shown (or placeholder)
+- [x] **`StockPileWidget`** — tappable stack; fan-offset for 3-card draw mode
+- [x] **`WastePileWidget`** — shows top 1 or 3 cards fanned
 - [ ] Ensure layout uses `LayoutBuilder` for different screen sizes
 - [ ] Landscape and portrait orientations handled gracefully
 
@@ -88,24 +88,27 @@ A phased plan for building a fully-featured Klondike Solitaire game in Flutter w
 
 **Goal:** Implement smooth, intuitive card dragging with valid drop-target highlighting.
 
-- [ ] Wrap draggable cards with Flutter's `Draggable<List<PlayingCard>>`
+- [x] Wrap draggable cards with Flutter's `Draggable<List<PlayingCard>>`
   - Drag data is a list (single card or a stack of cards)
   - `feedback` widget: lifted card(s) with shadow, slightly larger than normal
   - `childWhenDragging`: faded/ghost placeholder in original position
-- [ ] Wrap target piles with `DragTarget<List<PlayingCard>>`
+- [x] Wrap target piles with `DragTarget<List<PlayingCard>>`
   - `onWillAccept`: call move validator — returns `true`/`false`
   - `onAccept`: dispatch move to game state provider
-- [ ] **Visual drop-target feedback:**
+- [x] **Visual drop-target feedback:**
   - Valid target: green highlight border on pile
   - Invalid target: red tint or no highlight (reject silently)
-- [ ] **Multi-card drag** — dragging a face-up stack from a tableau pile drags all cards below it together; render as a fanned vertical stack in the feedback widget
-- [ ] **Tap-to-move shortcut:**
+- [x] **Multi-card drag** — dragging a face-up stack from a tableau pile drags all cards below it together; render as a fanned vertical stack in the feedback widget
+- [x] **Tap-to-move shortcut:**
   - Tap a waste card → auto-move to valid tableau or foundation if possible
   - Tap a tableau card → auto-move to foundation if valid
   - Tap stock → draw card(s)
-- [ ] **Tap stock** — flip 1 or 3 cards from stock to waste
+- [x] **Tap stock** — flip 1 or 3 cards from stock to waste
 - [ ] Snap-back animation when a drop is rejected (card flies back to origin)
 - [ ] Drag threshold (minimum drag distance before drag starts, to prevent accidental drags)
+- [x] Tableau-to-tableau moves working
+- [x] Foundation-to-tableau moves working
+- [x] Waste drag support
 
 ---
 
