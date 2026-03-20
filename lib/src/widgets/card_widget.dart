@@ -50,15 +50,15 @@ class CardWidget extends StatelessWidget {
         children: [
           // Top-left rank and suit
           Positioned(
-            left: 8,
-            top: 8,
+            left: 6,
+            top: 4,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   card.rank.toStringValue,
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: size.width * 0.2,
                     fontWeight: FontWeight.bold,
                     color: color,
                   ),
@@ -66,7 +66,7 @@ class CardWidget extends StatelessWidget {
                 Text(
                   card.suit.symbol,
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: size.width * 0.2,
                     fontWeight: FontWeight.bold,
                     color: color,
                   ),
@@ -80,8 +80,8 @@ class CardWidget extends StatelessWidget {
 
           // Bottom-right rank and suit (rotated)
           Positioned(
-            right: 8,
-            bottom: 8,
+            right: 6,
+            bottom: 4,
             child: Transform.rotate(
               angle: 180 * 3.14159 / 180,
               child: Column(
@@ -90,7 +90,7 @@ class CardWidget extends StatelessWidget {
                   Text(
                     card.rank.toStringValue,
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: size.width * 0.2,
                       fontWeight: FontWeight.bold,
                       color: color,
                     ),
@@ -98,7 +98,7 @@ class CardWidget extends StatelessWidget {
                   Text(
                     card.suit.symbol,
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: size.width * 0.2,
                       fontWeight: FontWeight.bold,
                       color: color,
                     ),
@@ -120,7 +120,7 @@ class CardWidget extends StatelessWidget {
       return Text(
         card.suit.symbol,
         style: TextStyle(
-          fontSize: 48,
+          fontSize: size.width * 0.5,
           fontWeight: FontWeight.bold,
           color: color,
         ),
@@ -128,7 +128,7 @@ class CardWidget extends StatelessWidget {
     }
 
     // For number cards, show pip layout
-    return _PipLayout(suit: card.suit, rank: card.rank, color: color);
+    return _PipLayout(suit: card.suit, rank: card.rank, color: color, size: size);
   }
 }
 
@@ -144,7 +144,7 @@ class _CardBack extends StatelessWidget {
       width: size.width,
       height: size.height,
       decoration: BoxDecoration(
-        color: const Color(0xFF1E3A5F),
+        color: const Color(0xFF1E3A5B),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: Colors.white, width: 2),
       ),
@@ -201,12 +201,16 @@ class _PipLayout extends StatelessWidget {
   final CardSuit suit;
   final CardRank rank;
   final Color color;
+  final Size size;
 
   const _PipLayout({
     required this.suit,
     required this.rank,
     required this.color,
+    required this.size,
   });
+
+  double get _pipSize => size.width * 0.10;
 
   @override
   Widget build(BuildContext context) {
@@ -214,24 +218,26 @@ class _PipLayout extends StatelessWidget {
 
     switch (pipCount) {
       case 1:
-        return _SinglePip(suit: suit, color: color);
+        return _SinglePip(suit: suit, color: color, pipSize: _pipSize);
       case 2:
+        return _TwoPipLayout(suit: suit, color: color, pipSize: _pipSize);
       case 3:
+        return _ThreePipLayout(suit: suit, color: color, pipSize: _pipSize);
       case 4:
+        return _FourPipLayout(suit: suit, color: color, pipSize: _pipSize);
       case 5:
-        return _SmallPipLayout(suit: suit, pipCount: pipCount, color: color);
+        return _FivePipLayout(suit: suit, color: color, pipSize: _pipSize);
       case 6:
-        return _SixPipLayout(suit: suit, color: color);
+        return _SixPipLayout(suit: suit, color: color, pipSize: _pipSize);
       case 7:
-        return _SevenPipLayout(suit: suit, color: color);
+        return _SevenPipLayout(suit: suit, color: color, pipSize: _pipSize);
       case 8:
-        return _EightPipLayout(suit: suit, color: color);
+        return _EightPipLayout(suit: suit, color: color, pipSize: _pipSize);
       case 9:
-        return _NinePipLayout(suit: suit, color: color);
+        return _NinePipLayout(suit: suit, color: color, pipSize: _pipSize);
       case 10:
-        return _TenPipLayout(suit: suit, color: color);
+        return _TenPipLayout(suit: suit, color: color, pipSize: _pipSize);
     }
-    // Should never reach here given CardRank values 1-13
     throw UnsupportedError('Unsupported pip count: $pipCount');
   }
 }
@@ -240,434 +246,290 @@ class _PipLayout extends StatelessWidget {
 class _SinglePip extends StatelessWidget {
   final CardSuit suit;
   final Color color;
+  final double pipSize;
 
-  const _SinglePip({required this.suit, required this.color});
+  const _SinglePip({required this.suit, required this.color, required this.pipSize});
 
   @override
   Widget build(BuildContext context) {
     return Text(
       suit.symbol,
-      style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: color),
+      style: TextStyle(fontSize: pipSize * 2.2, fontWeight: FontWeight.bold, color: color),
     );
   }
 }
 
-/// Layout for 2-5 pips.
-class _SmallPipLayout extends StatelessWidget {
+/// Layout for 2 pips (vertical).
+class _TwoPipLayout extends StatelessWidget {
   final CardSuit suit;
-  final int pipCount;
   final Color color;
+  final double pipSize;
 
-  const _SmallPipLayout({
-    required this.suit,
-    required this.pipCount,
-    required this.color,
-  });
+  const _TwoPipLayout({required this.suit, required this.color, required this.pipSize});
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final pipSize = constraints.maxWidth / 3;
-
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(
-            pipCount,
-            (index) => Center(
-              child: Text(
-                suit.symbol,
-                style: TextStyle(
-                  fontSize: pipSize * 0.6,
-                  fontWeight: FontWeight.bold,
-                  color: color,
-                ),
-              ),
-            ),
-          ),
-        );
-      },
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(suit.symbol, style: _pipStyle()),
+        SizedBox(height: pipSize * 0.8),
+        Text(suit.symbol, style: _pipStyle()),
+      ],
     );
   }
+
+  TextStyle _pipStyle() => TextStyle(fontSize: pipSize, fontWeight: FontWeight.bold, color: color);
+}
+
+/// Layout for 3 pips (vertical).
+class _ThreePipLayout extends StatelessWidget {
+  final CardSuit suit;
+  final Color color;
+  final double pipSize;
+
+  const _ThreePipLayout({required this.suit, required this.color, required this.pipSize});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(suit.symbol, style: _pipStyle()),
+        SizedBox(height: pipSize * 0.5),
+        Text(suit.symbol, style: _pipStyle()),
+        SizedBox(height: pipSize * 0.5),
+        Text(suit.symbol, style: _pipStyle()),
+      ],
+    );
+  }
+
+  TextStyle _pipStyle() => TextStyle(fontSize: pipSize, fontWeight: FontWeight.bold, color: color);
+}
+
+/// Layout for 4 pips (corners).
+class _FourPipLayout extends StatelessWidget {
+  final CardSuit suit;
+  final Color color;
+  final double pipSize;
+
+  const _FourPipLayout({required this.suit, required this.color, required this.pipSize});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: pipSize * 2.5,
+      height: pipSize * 2.5,
+      child: Stack(
+        children: [
+          Positioned(left: 0, top: 0, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(right: 0, top: 0, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(left: 0, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(right: 0, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
+        ],
+      ),
+    );
+  }
+
+  TextStyle _pipStyle() => TextStyle(fontSize: pipSize, fontWeight: FontWeight.bold, color: color);
+}
+
+/// Layout for 5 pips (4 corners + center).
+class _FivePipLayout extends StatelessWidget {
+  final CardSuit suit;
+  final Color color;
+  final double pipSize;
+
+  const _FivePipLayout({required this.suit, required this.color, required this.pipSize});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: pipSize * 2.5,
+      height: pipSize * 2.5,
+      child: Stack(
+        children: [
+          Positioned(left: 0, top: 0, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(right: 0, top: 0, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(left: 0, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(right: 0, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
+          Center(child: Text(suit.symbol, style: _pipStyle())),
+        ],
+      ),
+    );
+  }
+
+  TextStyle _pipStyle() => TextStyle(fontSize: pipSize, fontWeight: FontWeight.bold, color: color);
 }
 
 /// Layout for 6 pips (2 columns of 3).
 class _SixPipLayout extends StatelessWidget {
   final CardSuit suit;
   final Color color;
+  final double pipSize;
 
-  const _SixPipLayout({required this.suit, required this.color});
+  const _SixPipLayout({required this.suit, required this.color, required this.pipSize});
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final pipSize = constraints.maxWidth / 3;
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: List.filled(
-                3,
-                Text(
-                  suit.symbol,
-                  style: TextStyle(
-                    fontSize: pipSize * 0.6,
-                    fontWeight: FontWeight.bold,
-                    color: color,
-                  ),
-                ),
-              ),
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: List.filled(
-                3,
-                Text(
-                  suit.symbol,
-                  style: TextStyle(
-                    fontSize: pipSize * 0.6,
-                    fontWeight: FontWeight.bold,
-                    color: color,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        );
-      },
+    return SizedBox(
+      width: pipSize * 2.8,
+      height: pipSize * 3.0,
+      child: Stack(
+        children: [
+          // Left column
+          Positioned(left: 0, top: 0, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(left: 0, top: pipSize * 0.9, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(left: 0, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
+          // Right column
+          Positioned(right: 0, top: 0, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(right: 0, top: pipSize * 0.9, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(right: 0, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
+        ],
+      ),
     );
   }
+
+  TextStyle _pipStyle() => TextStyle(fontSize: pipSize, fontWeight: FontWeight.bold, color: color);
 }
 
-/// Layout for 7 pips (6 around center).
+/// Layout for 7 pips.
 class _SevenPipLayout extends StatelessWidget {
   final CardSuit suit;
   final Color color;
+  final double pipSize;
 
-  const _SevenPipLayout({required this.suit, required this.color});
+  const _SevenPipLayout({required this.suit, required this.color, required this.pipSize});
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final pipSize = constraints.maxWidth / 3;
-        return Stack(
-          children: [
-            // Left column (3)
-            Positioned(
-              left: 8,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: List.filled(
-                  3,
-                  Text(
-                    suit.symbol,
-                    style: TextStyle(
-                      fontSize: pipSize * 0.6,
-                      fontWeight: FontWeight.bold,
-                      color: color,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            // Center (1)
-            Positioned(
-              left: constraints.maxWidth / 2 - 10,
-              top: constraints.maxHeight / 2 - 10,
-              child: Text(
-                suit.symbol,
-                style: TextStyle(
-                  fontSize: pipSize * 0.6,
-                  fontWeight: FontWeight.bold,
-                  color: color,
-                ),
-              ),
-            ),
-            // Right column (3)
-            Positioned(
-              right: 8,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: List.filled(
-                  3,
-                  Text(
-                    suit.symbol,
-                    style: TextStyle(
-                      fontSize: pipSize * 0.6,
-                      fontWeight: FontWeight.bold,
-                      color: color,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        );
-      },
+    return SizedBox(
+      width: pipSize * 2.8,
+      height: pipSize * 2.8,
+      child: Stack(
+        children: [
+          // Left column (top, middle, bottom)
+          Positioned(left: 0, top: 0, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(left: 0, top: pipSize * 0.9, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(left: 0, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
+          // Right column (top, middle, bottom)
+          Positioned(right: 0, top: 0, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(right: 0, top: pipSize * 0.9, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(right: 0, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
+          // Center
+          Center(child: Text(suit.symbol, style: _pipStyle())),
+        ],
+      ),
     );
   }
+
+  TextStyle _pipStyle() => TextStyle(fontSize: pipSize, fontWeight: FontWeight.bold, color: color);
 }
 
-/// Layout for 8 pips (6 around, 2 extra).
+/// Layout for 8 pips.
 class _EightPipLayout extends StatelessWidget {
   final CardSuit suit;
   final Color color;
+  final double pipSize;
 
-  const _EightPipLayout({required this.suit, required this.color});
+  const _EightPipLayout({required this.suit, required this.color, required this.pipSize});
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final pipSize = constraints.maxWidth / 3;
-        return Stack(
-          children: [
-            // Left column (3)
-            Positioned(
-              left: 8,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: List.filled(
-                  3,
-                  Text(
-                    suit.symbol,
-                    style: TextStyle(
-                      fontSize: pipSize * 0.6,
-                      fontWeight: FontWeight.bold,
-                      color: color,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            // Center (2)
-            Positioned(
-              left: constraints.maxWidth / 2 - 15,
-              top: constraints.maxHeight / 3,
-              child: Text(
-                suit.symbol,
-                style: TextStyle(
-                  fontSize: pipSize * 0.6,
-                  fontWeight: FontWeight.bold,
-                  color: color,
-                ),
-              ),
-            ),
-            Positioned(
-              left: constraints.maxWidth / 2 - 15,
-              top: constraints.maxHeight * 2 / 3 - 10,
-              child: Text(
-                suit.symbol,
-                style: TextStyle(
-                  fontSize: pipSize * 0.6,
-                  fontWeight: FontWeight.bold,
-                  color: color,
-                ),
-              ),
-            ),
-            // Right column (3)
-            Positioned(
-              right: 8,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: List.filled(
-                  3,
-                  Text(
-                    suit.symbol,
-                    style: TextStyle(
-                      fontSize: pipSize * 0.6,
-                      fontWeight: FontWeight.bold,
-                      color: color,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        );
-      },
+    return SizedBox(
+      width: pipSize * 2.8,
+      height: pipSize * 2.8,
+      child: Stack(
+        children: [
+          // Left column
+          Positioned(left: 0, top: 0, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(left: 0, top: pipSize * 0.9, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(left: 0, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
+          // Right column
+          Positioned(right: 0, top: 0, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(right: 0, top: pipSize * 0.9, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(right: 0, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
+          // Center column (2 pips)
+          Positioned(left: pipSize * 0.9, top: pipSize * 0.3, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(right: pipSize * 0.9, bottom: pipSize * 0.3, child: Text(suit.symbol, style: _pipStyle())),
+        ],
+      ),
     );
   }
+
+  TextStyle _pipStyle() => TextStyle(fontSize: pipSize, fontWeight: FontWeight.bold, color: color);
 }
 
-/// Layout for 9 pips (8 around, 1 center).
+/// Layout for 9 pips.
 class _NinePipLayout extends StatelessWidget {
   final CardSuit suit;
   final Color color;
+  final double pipSize;
 
-  const _NinePipLayout({required this.suit, required this.color});
+  const _NinePipLayout({required this.suit, required this.color, required this.pipSize});
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final pipSize = constraints.maxWidth / 3;
-        return Stack(
-          children: [
-            // Left column (3)
-            Positioned(
-              left: 8,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: List.filled(
-                  3,
-                  Text(
-                    suit.symbol,
-                    style: TextStyle(
-                      fontSize: pipSize * 0.6,
-                      fontWeight: FontWeight.bold,
-                      color: color,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            // Center (1)
-            Positioned(
-              left: constraints.maxWidth / 2 - 10,
-              top: constraints.maxHeight / 2 - 10,
-              child: Text(
-                suit.symbol,
-                style: TextStyle(
-                  fontSize: pipSize * 0.6,
-                  fontWeight: FontWeight.bold,
-                  color: color,
-                ),
-              ),
-            ),
-            // Right column (3)
-            Positioned(
-              right: 8,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: List.filled(
-                  3,
-                  Text(
-                    suit.symbol,
-                    style: TextStyle(
-                      fontSize: pipSize * 0.6,
-                      fontWeight: FontWeight.bold,
-                      color: color,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        );
-      },
+    return SizedBox(
+      width: pipSize * 2.8,
+      height: pipSize * 2.8,
+      child: Stack(
+        children: [
+          // Left column (3)
+          Positioned(left: 0, top: 0, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(left: 0, top: pipSize * 0.9, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(left: 0, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
+          // Right column (3)
+          Positioned(right: 0, top: 0, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(right: 0, top: pipSize * 0.9, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(right: 0, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
+          // Center column (2 + 1 center)
+          Positioned(left: pipSize * 0.9, top: 0, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(right: pipSize * 0.9, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
+          Center(child: Text(suit.symbol, style: _pipStyle())),
+        ],
+      ),
     );
   }
+
+  TextStyle _pipStyle() => TextStyle(fontSize: pipSize, fontWeight: FontWeight.bold, color: color);
 }
 
-/// Layout for 10 pips (4 columns of 2 or 2 columns of 5).
+/// Layout for 10 pips.
 class _TenPipLayout extends StatelessWidget {
   final CardSuit suit;
   final Color color;
+  final double pipSize;
 
-  const _TenPipLayout({required this.suit, required this.color});
+  const _TenPipLayout({required this.suit, required this.color, required this.pipSize});
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final pipSize = constraints.maxWidth / 3;
-        return Stack(
-          children: [
-            // Left column (3)
-            Positioned(
-              left: 8,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: List.filled(
-                  3,
-                  Text(
-                    suit.symbol,
-                    style: TextStyle(
-                      fontSize: pipSize * 0.6,
-                      fontWeight: FontWeight.bold,
-                      color: color,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            // Center left (2)
-            Positioned(
-              left: constraints.maxWidth / 3 - 15,
-              child: Column(
-                children: [
-                  SizedBox(height: constraints.maxHeight * 0.15),
-                  Text(
-                    suit.symbol,
-                    style: TextStyle(
-                      fontSize: pipSize * 0.6,
-                      fontWeight: FontWeight.bold,
-                      color: color,
-                    ),
-                  ),
-                  SizedBox(height: constraints.maxHeight * 0.4),
-                  Text(
-                    suit.symbol,
-                    style: TextStyle(
-                      fontSize: pipSize * 0.6,
-                      fontWeight: FontWeight.bold,
-                      color: color,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // Center right (2)
-            Positioned(
-              left: constraints.maxWidth * 2 / 3 - 15,
-              child: Column(
-                children: [
-                  SizedBox(height: constraints.maxHeight * 0.15),
-                  Text(
-                    suit.symbol,
-                    style: TextStyle(
-                      fontSize: pipSize * 0.6,
-                      fontWeight: FontWeight.bold,
-                      color: color,
-                    ),
-                  ),
-                  SizedBox(height: constraints.maxHeight * 0.4),
-                  Text(
-                    suit.symbol,
-                    style: TextStyle(
-                      fontSize: pipSize * 0.6,
-                      fontWeight: FontWeight.bold,
-                      color: color,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // Right column (3)
-            Positioned(
-              right: 8,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: List.filled(
-                  3,
-                  Text(
-                    suit.symbol,
-                    style: TextStyle(
-                      fontSize: pipSize * 0.6,
-                      fontWeight: FontWeight.bold,
-                      color: color,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        );
-      },
+    return SizedBox(
+      width: pipSize * 3.0,
+      height: pipSize * 2.8,
+      child: Stack(
+        children: [
+          // Left column (3)
+          Positioned(left: 0, top: 0, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(left: 0, top: pipSize * 0.9, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(left: 0, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
+          // Right column (3)
+          Positioned(right: 0, top: 0, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(right: 0, top: pipSize * 0.9, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(right: 0, bottom: 0, child: Text(suit.symbol, style: _pipStyle())),
+          // Middle left (2)
+          Positioned(left: pipSize * 0.7, top: pipSize * 0.3, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(left: pipSize * 0.7, bottom: pipSize * 0.3, child: Text(suit.symbol, style: _pipStyle())),
+          // Middle right (2)
+          Positioned(right: pipSize * 0.7, top: pipSize * 0.3, child: Text(suit.symbol, style: _pipStyle())),
+          Positioned(right: pipSize * 0.7, bottom: pipSize * 0.3, child: Text(suit.symbol, style: _pipStyle())),
+        ],
+      ),
     );
   }
+
+  TextStyle _pipStyle() => TextStyle(fontSize: pipSize, fontWeight: FontWeight.bold, color: color);
 }

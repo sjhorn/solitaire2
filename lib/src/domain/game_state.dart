@@ -46,7 +46,7 @@ class GameState {
       for (var j = 0; j <= i; j++) {
         final card = deck.draw();
         tableauPiles[i].addCard(
-          j == i ? card.copyWith(faceUp: true) : card,
+          j == i ? card.copyWith(faceUp: true) : card.copyWith(faceUp: false),
         );
       }
     }

@@ -30,14 +30,16 @@ class StockPileWidget extends StatelessWidget {
         child: pile.isEmpty
             ? null
             : Stack(
+                clipBehavior: Clip.none,
                 children: [
-                  for (var i = 0; i < pile.cards.length; i++)
+                  // Show only the top card visible, with cards stacked behind
+                  for (var i = pile.cards.length - 1; i >= 0 && i > pile.cards.length - 6; i--)
                     Positioned(
-                      left: i * 2,
-                      top: i * 2,
+                      left: (pile.cards.length - 1 - i) * 1.5,
+                      top: (pile.cards.length - 1 - i) * 1.5,
                       child: CardWidget(
                         card: pile.cards[i],
-                        size: Size(76 - i * 2, 116 - i * 2),
+                        size: const Size(80, 120),
                       ),
                     ),
                 ],

@@ -33,21 +33,20 @@ class TableauPileWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Calculate the width and height needed for all cards
     final cardCount = pile.cards.length;
-    final cardWidth = 80.0; // Standard card width
-    final cardHeight = 120.0; // Standard card height
-    final overlap = 30.0;
+    final cardWidth = 80.0;
+    final cardHeight = 120.0;
+    final verticalOverlap = 20.0;
 
-    final totalWidth = cardCount > 0 ? cardWidth + (cardCount - 1) * overlap : cardWidth;
-    final totalHeight = cardCount > 0 ? cardHeight + (cardCount - 1) * overlap : cardHeight;
+    // Calculate total size needed for the pile - cards stack vertically with small offset
+    final totalWidth = cardWidth + 20.0;
+    final totalHeight = cardCount > 0 ? cardHeight + (cardCount - 1) * verticalOverlap : cardHeight;
 
     return DragTarget<List<PlayingCard>>(
       onWillAcceptWithDetails: (details) {
         final data = details.data;
         if (data.isEmpty) return false;
-        final card = data.first;
-        return _isValidDrop(card);
+        return _isValidDrop(data.first);
       },
       onAcceptWithDetails: (details) {
         final data = details.data;
@@ -61,11 +60,12 @@ class TableauPileWidget extends StatelessWidget {
           width: totalWidth,
           height: totalHeight,
           child: Stack(
-            children: pile.cards
-                .asMap()
-                .entries
-                .map((entry) => _buildCard(entry.key, entry.value, isDragOver))
-                .toList(),
+            clipBehavior: Clip.none,
+            children: pile.cards.asMap().entries.map((entry) {
+              final index = entry.key;
+              final card = entry.value;
+              return _buildCard(index, card, isDragOver);
+            }).toList(),
           ),
         );
       },
@@ -73,47 +73,58 @@ class TableauPileWidget extends StatelessWidget {
   }
 
   Widget _buildCard(int index, PlayingCard card, bool isDragOver) {
-    return Positioned(
-      left: index * 30, // Overlap cards horizontally
-      top: index * 30, // Overlap cards vertically
-      child: _buildDraggableCard(card, index, isDragOver),
-    );
-  }
-
-  Widget _buildDraggableCard(PlayingCard card, int index, bool isDragOver) {
     final isTopCard = index == pile.cards.length - 1;
     final isFaceUp = card.faceUp;
+
+    // Calculate position - cards stack vertically with small horizontal offset for visual separation
+    final cardX = index * 2.0;
+    final cardY = index * 20.0;
 
     if (isTopCard && isFaceUp) {
       // Get all consecutive face-up cards from the top
       final stack = _getFaceUpStack();
 
+      // Build the card widget with optional drag
       final cardWidget = Container(
         decoration: BoxDecoration(
           border: isDragOver ? Border.all(color: Colors.green, width: 2) : null,
+          borderRadius: BorderRadius.circular(8),
         ),
         child: CardWidget(card: card),
       );
 
-      // Wrap with GestureDetector for tap-to-move
-      return GestureDetector(
-        onTap: onAutoMove != null ? () => onAutoMove!(card) : null,
+      // Only the top card is draggable, but it carries the whole stack
+      return Positioned(
+        left: cardX,
+        top: cardY,
         child: Draggable<List<PlayingCard>>(
           data: stack,
-          childWhenDragging: _buildStackPreview(stack, false),
           feedback: _buildStackPreview(stack, true),
-          child: cardWidget,
+          childWhenDragging: _buildFaceDownPlaceholder(),
+          child: GestureDetector(
+            onTap: onAutoMove != null ? () => onAutoMove!(card) : null,
+            child: cardWidget,
+          ),
         ),
       );
     }
 
-    return CardWidget(card: card);
+    // Face-down cards or cards below face-up stack are not interactive
+    return Positioned(
+      left: cardX,
+      top: cardY,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: CardWidget(card: card),
+      ),
+    );
   }
 
   /// Returns all consecutive face-up cards from the top of the pile
   List<PlayingCard> _getFaceUpStack() {
     final stack = <PlayingCard>[];
-    // Start from the top and go down while cards are face-up
     for (var i = pile.cards.length - 1; i >= 0; i--) {
       if (pile.cards[i].faceUp) {
         stack.insert(0, pile.cards[i]);
@@ -124,52 +135,65 @@ class TableauPileWidget extends StatelessWidget {
     return stack;
   }
 
+  /// Builds a face-down card placeholder shown while dragging
+  Widget _buildFaceDownPlaceholder() {
+    return Container(
+      width: 80,
+      height: 120,
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E3A5B),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.white, width: 2),
+      ),
+    );
+  }
+
   /// Builds a visual preview of the card stack for drag feedback
   Widget _buildStackPreview(List<PlayingCard> stack, bool isFeedback) {
     if (stack.length == 1) {
-      return CardWidget(card: stack.first);
+      return CardWidget(
+        card: stack.first,
+        size: isFeedback ? const Size(85, 130) : const Size(80, 120),
+      );
     }
 
-    // Show fanned stack of cards
-    final cardWidth = 80.0;
-    final cardHeight = 120.0;
-    final overlap = 20.0;
+    // Show fanned stack of cards with proper overlap
+    final cardWidth = isFeedback ? 85.0 : 80.0;
+    final cardHeight = isFeedback ? 130.0 : 120.0;
+    final overlap = 15.0;
     final totalWidth = cardWidth + (stack.length - 1) * overlap;
-    final totalHeight = cardHeight;
 
     return SizedBox(
       width: totalWidth,
-      height: totalHeight,
+      height: cardHeight,
       child: Stack(
-        children: stack
-            .asMap()
-            .entries
-            .map((entry) => Positioned(
-                  left: entry.key * overlap,
-                  top: 0,
-                  child: CardWidget(
-                    card: entry.value,
-                    size: isFeedback ? const Size(85, 130) : const Size(80, 120),
-                  ),
-                ))
-            .toList(),
+        clipBehavior: Clip.none,
+        children: stack.asMap().entries.map((entry) {
+          final i = entry.key;
+          final card = entry.value;
+          return Positioned(
+            left: i * overlap,
+            top: 0,
+            child: CardWidget(
+              card: card,
+              size: Size(cardWidth, cardHeight),
+            ),
+          );
+        }).toList(),
       ),
     );
   }
 
   bool _isValidDrop(PlayingCard card) {
-    // Tableau accepts face-up cards only
     if (!card.faceUp) return false;
 
     if (pile.isEmpty) {
-      // Only King can be placed on empty tableau
       return card.rank == CardRank.king;
     }
 
     final topCard = pile.topCard;
     if (topCard == null) return false;
 
-    // Must be opposite color and descending rank
     final isOppositeColor = (card.suit.isRed && topCard.suit.isBlack) ||
         (card.suit.isBlack && topCard.suit.isRed);
     return isOppositeColor && card.rank.value == topCard.rank.value - 1;
