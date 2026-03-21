@@ -81,23 +81,36 @@ class BoardWidget extends StatelessWidget {
     return Positioned(
       top: 20,
       left: (boardWidth - 600) / 2,
-      child: Row(
-        children: [
-          // Stock pile
-          StockPileWidget(pile: gameState.stockPile, onTap: onStockTap),
-          // Waste pile
-          WastePileWidget(pile: gameState.wastePile, isHinted: _isHintedWaste()),
-          // Gap
-          const SizedBox(width: 60),
-          // Foundation piles (up to 4)
-          for (int i = 0; i < 4 && i < foundationPiles.length; i++)
-            FoundationPileWidget(
-              pile: foundationPiles[i],
-              foundationIndex: i,
-              onDrop: onDropOnFoundation,
-              isHinted: _isHintedFoundation(i),
+      child: Semantics(
+        label: 'Top row: Stock, Waste, and Foundation piles',
+        child: Row(
+          children: [
+            // Stock pile
+            Semantics(
+              label: 'Stock pile, tap to draw cards',
+              button: true,
+              child: StockPileWidget(pile: gameState.stockPile, onTap: onStockTap),
             ),
-        ],
+            // Waste pile
+            Semantics(
+              label: 'Waste pile${_isHintedWaste() ? ', hint available' : ''}',
+              child: WastePileWidget(pile: gameState.wastePile, isHinted: _isHintedWaste()),
+            ),
+            // Gap
+            const SizedBox(width: 60),
+            // Foundation piles (up to 4)
+            for (int i = 0; i < 4 && i < foundationPiles.length; i++)
+              Semantics(
+                label: 'Foundation pile ${i + 1}${_isHintedFoundation(i) ? ', hint available' : ''}',
+                child: FoundationPileWidget(
+                  pile: foundationPiles[i],
+                  foundationIndex: i,
+                  onDrop: onDropOnFoundation,
+                  isHinted: _isHintedFoundation(i),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

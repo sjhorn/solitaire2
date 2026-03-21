@@ -47,29 +47,32 @@ class FoundationPileWidget extends StatelessWidget {
         final borderColor = isHinted ? Colors.green : (isDragOver ? Colors.green : Colors.grey);
         final borderWidth = isHinted ? 3.0 : (isDragOver ? 3.0 : 2.0);
         final bgColor = isHinted ? Colors.green.withValues(alpha: 0.2) : (isDragOver ? Colors.green.withValues(alpha: 0.2) : null);
-        return Container(
-          width: 80,
-          height: 120,
-          margin: const EdgeInsets.all(4),
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: borderColor,
-              width: borderWidth,
+        return Semantics(
+          label: 'Foundation pile ${foundationIndex + 1}${pile.isEmpty ? ', empty' : ', ${pile.cards.length} cards'}${isHinted ? ', hint available' : ''}',
+          child: Container(
+            width: 80,
+            height: 120,
+            margin: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: borderColor,
+                width: borderWidth,
+              ),
+              borderRadius: BorderRadius.circular(8),
+              color: bgColor,
             ),
-            borderRadius: BorderRadius.circular(8),
-            color: bgColor,
-          ),
-          child: Center(
-            child: pile.isEmpty
-                ? Text(
-                    'A',
-                    style: TextStyle(
-                      fontSize: 48,
-                      color: isHinted ? Colors.green : Colors.grey,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  )
-                : CardWidget(card: pile.topCardThrow),
+            child: Center(
+              child: pile.isEmpty
+                  ? Text(
+                      'A',
+                      style: TextStyle(
+                        fontSize: 48,
+                        color: isHinted ? Colors.green : Colors.grey,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    )
+                  : CardWidget(card: pile.topCardThrow),
+            ),
           ),
         );
       },

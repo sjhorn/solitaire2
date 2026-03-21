@@ -23,91 +23,110 @@ class CardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!card.faceUp) {
-      return _CardBack(size: size);
+      return Semantics(
+        label: 'Card back',
+        child: _CardBack(size: size),
+      );
     }
 
     final isRed =
         card.suit == CardSuit.hearts || card.suit == CardSuit.diamonds;
     final color = isRed ? Colors.red : Colors.black;
+    final cardName = '${card.rank.toStringValue} of ${card.suit.name}';
 
-    return Container(
-      width: size.width,
-      height: size.height,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: card.isSelected
-            ? [
-                BoxShadow(
-                  color: Colors.black.withAlpha(77),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ]
-            : null,
-      ),
-      child: Stack(
-        children: [
-          // Top-left rank and suit
-          Positioned(
-            left: 6,
-            top: 4,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  card.rank.toStringValue,
-                  style: TextStyle(
-                    fontSize: size.width * 0.2,
-                    fontWeight: FontWeight.bold,
-                    color: color,
+    return Semantics(
+      label: '$cardName, ${card.suit.symbol}',
+      child: Container(
+        width: size.width,
+        height: size.height,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: card.isSelected
+              ? [
+                  BoxShadow(
+                    color: Colors.black.withAlpha(77),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
                   ),
-                ),
-                Text(
-                  card.suit.symbol,
-                  style: TextStyle(
-                    fontSize: size.width * 0.2,
-                    fontWeight: FontWeight.bold,
-                    color: color,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Center suit symbol or pip layout
-          Center(child: _buildCenterContent(color)),
-
-          // Bottom-right rank and suit (rotated)
-          Positioned(
-            right: 6,
-            bottom: 4,
-            child: Transform.rotate(
-              angle: 180 * 3.14159 / 180,
+                ]
+              : null,
+        ),
+        child: Stack(
+          children: [
+            // Top-left rank and suit
+            Positioned(
+              left: 6,
+              top: 4,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    card.rank.toStringValue,
-                    style: TextStyle(
-                      fontSize: size.width * 0.2,
-                      fontWeight: FontWeight.bold,
-                      color: color,
+                  Semantics(
+                    label: card.rank.toStringValue,
+                    child: Text(
+                      card.rank.toStringValue,
+                      style: TextStyle(
+                        fontSize: size.width * 0.2,
+                        fontWeight: FontWeight.bold,
+                        color: color,
+                      ),
                     ),
                   ),
-                  Text(
-                    card.suit.symbol,
-                    style: TextStyle(
-                      fontSize: size.width * 0.2,
-                      fontWeight: FontWeight.bold,
-                      color: color,
+                  Semantics(
+                    label: '${card.suit.symbol} suit',
+                    child: Text(
+                      card.suit.symbol,
+                      style: TextStyle(
+                        fontSize: size.width * 0.2,
+                        fontWeight: FontWeight.bold,
+                        color: color,
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-          ),
-        ],
+
+            // Center suit symbol or pip layout
+            Center(child: _buildCenterContent(color)),
+
+            // Bottom-right rank and suit (rotated)
+            Positioned(
+              right: 6,
+              bottom: 4,
+              child: Transform.rotate(
+                angle: 180 * 3.14159 / 180,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Semantics(
+                      label: card.rank.toStringValue,
+                      child: Text(
+                        card.rank.toStringValue,
+                        style: TextStyle(
+                          fontSize: size.width * 0.2,
+                          fontWeight: FontWeight.bold,
+                          color: color,
+                        ),
+                      ),
+                    ),
+                    Semantics(
+                      label: '${card.suit.symbol} suit',
+                      child: Text(
+                        card.suit.symbol,
+                        style: TextStyle(
+                          fontSize: size.width * 0.2,
+                          fontWeight: FontWeight.bold,
+                          color: color,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
