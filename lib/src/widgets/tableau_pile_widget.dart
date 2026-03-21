@@ -60,16 +60,19 @@ class TableauPileWidget extends StatelessWidget {
       },
       builder: (context, candidateData, rejectedData) {
         final isDragOver = candidateData.isNotEmpty;
-        return SizedBox(
-          width: totalWidth,
-          height: totalHeight,
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: pile.cards.asMap().entries.map((entry) {
-              final index = entry.key;
-              final card = entry.value;
-              return _buildCard(index, card, isDragOver);
-            }).toList(),
+        return Semantics(
+          label: 'Tableau pile ${tableauIndex + 1}${pile.isEmpty ? ', empty' : ', ${pile.cards.length} cards'}${isHinted ? ', hint available' : ''}',
+          child: SizedBox(
+            width: totalWidth,
+            height: totalHeight,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: pile.cards.asMap().entries.map((entry) {
+                final index = entry.key;
+                final card = entry.value;
+                return _buildCard(index, card, isDragOver);
+              }).toList(),
+            ),
           ),
         );
       },

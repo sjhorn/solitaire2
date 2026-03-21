@@ -29,29 +29,14 @@ class WastePileWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (pile.isEmpty) {
-      return GestureDetector(
-        onTap: onTap,
-        child: Container(
-          width: 80,
-          height: 120,
-          margin: const EdgeInsets.all(4),
-          decoration: BoxDecoration(
-            border: Border.all(color: isHinted ? Colors.green : Colors.grey, width: isHinted ? 3 : 2),
-            borderRadius: BorderRadius.circular(8),
-            color: isHinted ? Colors.green.withValues(alpha: 0.2) : null,
-          ),
-          child: const SizedBox.shrink(),
-        ),
-      );
-    }
+    final isEmpty = pile.isEmpty;
+    final cardCount = pile.cards.length;
 
-    final topCard = pile.topCardThrow;
-
-    return DragTarget<List<PlayingCard>>(
-      onWillAcceptWithDetails: (details) => false, // Don't allow dropping on waste
-      builder: (context, candidateData, rejectedData) {
-        return GestureDetector(
+    if (isEmpty) {
+      return Semantics(
+        label: 'Waste pile, empty, tap to draw cards',
+        button: true,
+        child: GestureDetector(
           onTap: onTap,
           child: Container(
             width: 80,
@@ -62,19 +47,44 @@ class WastePileWidget extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
               color: isHinted ? Colors.green.withValues(alpha: 0.2) : null,
             ),
-            child: Draggable<List<PlayingCard>>(
-              data: [topCard],
-              feedback: CardWidget(card: topCard, size: const Size(85, 130)),
-              childWhenDragging: Container(
-                width: 80,
-                height: 120,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1E3A5B),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.white, width: 2),
-                ),
+            child: const SizedBox.shrink(),
+          ),
+        ),
+      );
+    }
+
+    final topCard = pile.topCardThrow;
+
+    return DragTarget<List<PlayingCard>>(
+      onWillAcceptWithDetails: (details) => false,
+      builder: (context, candidateData, rejectedData) {
+        return Semantics(
+          label: 'Waste pile, $cardCount cards, tap to draw',
+          child: GestureDetector(
+            onTap: onTap,
+            child: Container(
+              width: 80,
+              height: 120,
+              margin: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                border: Border.all(color: isHinted ? Colors.green : Colors.grey, width: isHinted ? 3 : 2),
+                borderRadius: BorderRadius.circular(8),
+                color: isHinted ? Colors.green.withValues(alpha: 0.2) : null,
               ),
-              child: CardWidget(card: topCard),
+              child: Draggable<List<PlayingCard>>(
+                data: [topCard],
+                feedback: CardWidget(card: topCard, size: const Size(85, 130)),
+                childWhenDragging: Container(
+                  width: 80,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1E3A5B),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.white, width: 2),
+                  ),
+                ),
+                child: CardWidget(card: topCard),
+              ),
             ),
           ),
         );

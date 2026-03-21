@@ -39,17 +39,23 @@ class _HighScoresScreenState extends State<HighScoresScreen> {
       appBar: AppBar(
         title: const Text('High Scores'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _loadScores,
-            tooltip: 'Refresh',
+          Semantics(
+            label: 'Refresh high scores',
+            button: true,
+            child: IconButton(
+              icon: const Icon(Icons.refresh),
+              onPressed: _loadScores,
+              tooltip: 'Refresh',
+            ),
           ),
         ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _allScores.isEmpty
-              ? const Center(
+              ? Semantics(
+                  label: 'No high scores yet. Play games to earn scores.',
+                  child: const Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -66,24 +72,30 @@ class _HighScoresScreenState extends State<HighScoresScreen> {
                       ),
                     ],
                   ),
-                )
-              : DefaultTabController(
-                  length: _allScores.length,
-                  child: Column(
-                    children: [
-                      // Tab bar for configurations
-                      Container(
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                ),
+              )
+              : Semantics(
+                  label: 'High scores by configuration',
+                  child: DefaultTabController(
+                    length: _allScores.length,
+                    child: Column(
+                      children: [
+                        // Tab bar for configurations
+                        Semantics(
+                          label: 'Game configuration tabs',
+                          child: Container(
+                            height: 50,
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                            ),
+                            child: TabBar(
+                              isScrollable: true,
+                              tabs: _allScores.keys.map((config) {
+                                return Tab(text: _formatConfiguration(config));
+                              }).toList(),
+                            ),
+                          ),
                         ),
-                        child: TabBar(
-                          isScrollable: true,
-                          tabs: _allScores.keys.map((config) {
-                            return Tab(text: _formatConfiguration(config));
-                          }).toList(),
-                        ),
-                      ),
                       // Tab views for each configuration
                       Expanded(
                         child: TabBarView(
@@ -96,6 +108,7 @@ class _HighScoresScreenState extends State<HighScoresScreen> {
                     ],
                   ),
                 ),
+              ),
     );
   }
 
@@ -112,55 +125,65 @@ class _HighScoresScreenState extends State<HighScoresScreen> {
 
   Widget _buildScoreList(List<HighScore> scores, String configuration) {
     if (scores.isEmpty) {
-      return const Center(
-        child: Text('No scores for this configuration'),
+      return Semantics(
+        label: 'No scores for this configuration',
+        child: const Center(
+          child: Text('No scores for this configuration'),
+        ),
       );
     }
 
-    return ListView.builder(
-      padding: const EdgeInsets.all(8),
-      itemCount: scores.length,
-      itemBuilder: (context, index) {
-        final score = scores[index];
-        final isTopThree = index < 3;
+    return Semantics(
+      label: 'High scores for ${_formatConfiguration(configuration)}',
+      child: ListView.builder(
+        padding: const EdgeInsets.all(8),
+        itemCount: scores.length,
+        itemBuilder: (context, index) {
+          final score = scores[index];
+          final isTopThree = index < 3;
+          final rank = index + 1;
 
-        return Card(
-          margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-          child: ListTile(
-            leading: _buildRankBadge(index, isTopThree),
-            title: Text(
-              'Score: ${score.score}',
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 4),
-                Text('Moves: ${score.moves}'),
-                Text('Time: ${_formatDuration(score.duration)}'),
-                Text(
-                  'Played: ${_formatDate(score.playedAt)}',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+          return Semantics(
+            label: 'Rank ${isTopThree ? rank : '#$rank'}: Score ${score.score}, Moves ${score.moves}, Time ${_formatDuration(score.duration)}',
+            child: Card(
+              margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+              child: ListTile(
+                leading: _buildRankBadge(index, isTopThree),
+                title: Text(
+                  'Score: ${score.score}',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
-              ],
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 4),
+                    Text('Moves: ${score.moves}'),
+                    Text('Time: ${_formatDuration(score.duration)}'),
+                    Text(
+                      'Played: ${_formatDate(score.playedAt)}',
+                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                    ),
+                  ],
+                ),
+                trailing: isTopThree
+                    ? Icon(
+                        index == 0
+                            ? Icons.emoji_events
+                            : (index == 1
+                                ? Icons.local_fire_department
+                                : Icons.local_fire_department_outlined),
+                        color: index == 0
+                            ? const Color(0xFFFFD700) // Gold
+                            : (index == 1
+                                ? Colors.orange
+                                : const Color(0xFF8B4513)), // Brown
+                      )
+                    : null,
+              ),
             ),
-            trailing: isTopThree
-                ? Icon(
-                    index == 0
-                        ? Icons.emoji_events
-                        : (index == 1
-                            ? Icons.local_fire_department
-                            : Icons.local_fire_department_outlined),
-                    color: index == 0
-                        ? const Color(0xFFFFD700) // Gold
-                        : (index == 1
-                            ? Colors.orange
-                            : const Color(0xFF8B4513)), // Brown
-                  )
-                : null,
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 

@@ -17,32 +17,35 @@ class ScoreDisplayWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _ScoreItem(
-            label: 'Score',
-            value: score.score.toString(),
-          ),
-          const SizedBox(width: 16),
-          _ScoreItem(
-            label: 'Moves',
-            value: score.moves.toString(),
-          ),
-          if (showTimer) ...[
+    return Semantics(
+      label: 'Score: ${score.score}, Moves: ${score.moves}${showTimer ? ', Time: ${_formatDuration(score.elapsedDuration)}' : ''}',
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _ScoreItem(
+              label: 'Score',
+              value: score.score.toString(),
+            ),
             const SizedBox(width: 16),
             _ScoreItem(
-              label: 'Time',
-              value: _formatDuration(score.elapsedDuration),
+              label: 'Moves',
+              value: score.moves.toString(),
             ),
+            if (showTimer) ...[
+              const SizedBox(width: 16),
+              _ScoreItem(
+                label: 'Time',
+                value: _formatDuration(score.elapsedDuration),
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

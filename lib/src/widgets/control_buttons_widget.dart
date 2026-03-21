@@ -24,28 +24,42 @@ class ControlButtonsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        _ControlButton(
-          icon: Icons.refresh,
-          label: 'New Game',
-          onTap: onNewGame,
-        ),
-        const SizedBox(width: 12),
-        _ControlButton(
-          icon: Icons.undo,
-          label: 'Undo',
-          onTap: onUndo,
-          enabled: undoEnabled,
-        ),
-        const SizedBox(width: 12),
-        _ControlButton(
-          icon: Icons.lightbulb,
-          label: 'Hint',
-          onTap: onHint,
-        ),
-      ],
+    return Semantics(
+      label: 'Game controls',
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Semantics(
+            label: 'New Game button',
+            button: true,
+            child: _ControlButton(
+              icon: Icons.refresh,
+              label: 'New Game',
+              onTap: onNewGame,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Semantics(
+            label: 'Undo button${undoEnabled ? '' : ', disabled'}',
+            child: _ControlButton(
+              icon: Icons.undo,
+              label: 'Undo',
+              onTap: onUndo,
+              enabled: undoEnabled,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Semantics(
+            label: 'Hint button',
+            button: true,
+            child: _ControlButton(
+              icon: Icons.lightbulb,
+              label: 'Hint',
+              onTap: onHint,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
