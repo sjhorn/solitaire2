@@ -5,6 +5,7 @@ import 'package:solitaire/src/domain/game_service.dart';
 import 'package:solitaire/src/domain/playing_card.dart';
 import 'package:solitaire/src/hint_service.dart';
 import 'package:solitaire/src/screens/settings_screen.dart';
+import 'package:solitaire/src/services/audio_service.dart';
 import 'package:solitaire/src/widgets/board_widget.dart';
 import 'package:solitaire/src/widgets/control_buttons_widget.dart';
 import 'package:solitaire/src/widgets/score_display_widget.dart';
@@ -38,12 +39,14 @@ class SolitaireHome extends StatefulWidget {
 
 class _SolitaireHomeState extends State<SolitaireHome> {
   late GameService _gameService;
+  late AudioService _audioService;
   Timer? _timer;
   Hint? _currentHint;
 
   @override
   void initState() {
     super.initState();
+    _audioService = AudioService();
     _startNewGame();
     _startTimer();
   }
@@ -51,6 +54,7 @@ class _SolitaireHomeState extends State<SolitaireHome> {
   @override
   void dispose() {
     _timer?.cancel();
+    _audioService.dispose();
     super.dispose();
   }
 
@@ -69,6 +73,8 @@ class _SolitaireHomeState extends State<SolitaireHome> {
 
   void _drawCard() {
     _gameService.drawCard();
+    _audioService.playStockTap();
+    _audioService.triggerHaptic();
     setState(() {});
   }
 
@@ -77,6 +83,8 @@ class _SolitaireHomeState extends State<SolitaireHome> {
     var result = _gameService.moveWasteToFoundation(foundationIndex);
     if (result != null) {
       _gameService = result;
+      _audioService.playCardPlace();
+      _audioService.triggerHaptic();
       _checkWin();
       setState(() {});
       return;
@@ -87,11 +95,16 @@ class _SolitaireHomeState extends State<SolitaireHome> {
       result = _gameService.moveTableauToFoundation(tableauIndex, foundationIndex);
       if (result != null) {
         _gameService = result;
+        _audioService.playCardPlace();
+        _audioService.triggerHaptic();
         _checkWin();
         setState(() {});
         return;
       }
     }
+
+    // Move rejected
+    _audioService.playMoveRejected();
   }
 
   void _dropOnTableau(PlayingCard card, int tableauIndex) {
@@ -99,6 +112,8 @@ class _SolitaireHomeState extends State<SolitaireHome> {
     var result = _gameService.moveWasteToTableau(tableauIndex);
     if (result != null) {
       _gameService = result;
+      _audioService.playCardSlide();
+      _audioService.triggerHaptic();
       _checkWin();
       setState(() {});
       return;
@@ -109,6 +124,8 @@ class _SolitaireHomeState extends State<SolitaireHome> {
       result = _gameService.moveFoundationToTableau(foundationIndex, tableauIndex);
       if (result != null) {
         _gameService = result;
+        _audioService.playCardSlide();
+        _audioService.triggerHaptic();
         _checkWin();
         setState(() {});
         return;
@@ -121,16 +138,23 @@ class _SolitaireHomeState extends State<SolitaireHome> {
       result = _gameService.moveTableauToTableau(fromTableauIndex, tableauIndex);
       if (result != null) {
         _gameService = result;
+        _audioService.playCardSlide();
+        _audioService.triggerHaptic();
         _checkWin();
         setState(() {});
         return;
       }
     }
+
+    // Move rejected
+    _audioService.playMoveRejected();
   }
 
   void _checkWin() {
     if (_gameService.isWon) {
       _gameService.markWon();
+      _audioService.playWinFanfare();
+      _audioService.triggerHeavyHaptic();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Congratulations! You won!')),
       );
